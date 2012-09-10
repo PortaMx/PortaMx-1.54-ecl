@@ -518,8 +518,8 @@ function DoLogin()
 		obExit(false);
 ]]></search>
 			<add><![CDATA[
-	if(!pmx_checkECL_Cookie() && (empty($user_info['possibly_robot']) || empty($_SESSION)))
-		pmx_ECL_Error('request');
+	if(!pmx_checkECL_Cookie())
+		return;
 ]]></add>
 		</operation>
 
@@ -578,7 +578,7 @@ function DoLogin()
 		return;
 ]]></search>
 			<add><![CDATA[
-	if(!pmx_checkECL_Cookie() && (empty($user_info['possibly_robot']) || empty($_SESSION)))
+	if(!pmx_checkECL_Cookie() && empty($user_info['possibly_robot']))
 		return;
 ]]></add>
 		</operation>
