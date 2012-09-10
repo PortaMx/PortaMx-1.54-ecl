@@ -1,0 +1,938 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="xslt/modification.xsl" type="text/xsl"?>
+<!DOCTYPE modification SYSTEM "http://www.simplemachines.org/xml/modification">
+
+<modification xmlns="http://www.simplemachines.org/xml/modification" xmlns:smf="http://www.simplemachines.org/">
+	<id>portamx_corp:PortaMx</id>
+	<version>1.5</version>
+
+	<!-- index.php -->
+	<file name="$boarddir/index.php">
+		<operation>
+			<search position="replace"><![CDATA[
+if (isset($_REQUEST['wap']) || isset($_REQUEST['wap2']) || isset($_REQUEST['imode']))
+	unset($_SESSION['nowap']);
+elseif (isset($_REQUEST['nowap']))
+	$_SESSION['nowap'] = true;
+]]></search>
+			<add><![CDATA[
+if ((isset($_REQUEST['wap']) || isset($_REQUEST['wap2']) || isset($_REQUEST['imode'])) && isset($_SESSION['nowap']))
+	unset($_SESSION['nowap']);
+elseif (isset($_REQUEST['nowap']) && pmx_checkECL_Cookie())
+	$_SESSION['nowap'] = true;
+]]></add>
+		</operation>
+
+		<operation>
+			<search position="after"><![CDATA[
+	// Is the forum in maintenance mode? (doesn't apply to administrators.)
+	if (!empty($maintenance) && !allowedTo('admin_forum'))
+	{
+]]></search>
+			<add><![CDATA[
+	// portal enable/disable request ?
+	if((isset($_REQUEST['pmxportal']) || isset($_REQUEST['pmxsef'])) && allowedTo('admin_forum'))
+	{
+		$mode = 'pmx'. (isset($_REQUEST['pmxportal']) ? 'portal' : 'sef');
+		updateSettings(array($mode .'_disabled' => $_REQUEST[$mode] == 'off' ? '1' : '0'));
+		redirectexit();
+	}
+
+	// Check ECL compatibility
+	if(empty($maintenance) && (WIRELESS || empty($modSettings['pmx_eclmodal'])) && !pmx_checkECL_Cookie() && $user_info['is_guest'] && empty($user_info['possibly_robot']))
+		return 'pmx_ECL_Init';
+
+	// start the portal if enabled..
+	elseif(empty($modSettings['pmxportal_disabled']))
+		PortaMx();
+]]></add>
+		</operation>
+
+		<operation>
+			<search position="replace"><![CDATA[
+		else
+		{
+			require_once($sourcedir . '/Subs-Auth.php');
+			return 'InMaintenance';
+]]></search>
+			<add><![CDATA[
+		else
+		{
+			pmx_ECL_Init();
+			require_once($sourcedir . '/Subs-Auth.php');
+			return 'InMaintenance';
+]]></add>
+		</operation>
+
+		<operation>
+			<search position="replace"><![CDATA[
+	elseif (empty($modSettings['allow_guestAccess']) && $user_info['is_guest'] && (!isset($_REQUEST['action']) || !in_array($_REQUEST['action'], array('coppa', 'login', 'login2', 'register', 'register2', 'reminder', 'activate', 'help', 'smstats', 'mailq', 'verificationcode', 'openidreturn'))))
+	{
+		require_once($sourcedir . '/Subs-Auth.php');
+		return 'KickGuest';
+	}
+]]></search>
+			<add><![CDATA[
+	elseif (empty($modSettings['allow_guestAccess']) && $user_info['is_guest'] && (!isset($_REQUEST['action']) || !in_array($_REQUEST['action'], array('coppa', 'login', 'login2', 'register', 'register2', 'reminder', 'activate', 'help', 'smstats', 'mailq', 'verificationcode', 'openidreturn'))))
+	{
+		if(empty($modSettings['pmxportal_disabled']))
+			return PortaMx_allow_guest($board, $topic);
+		else
+		{
+			require_once($sourcedir . '/Subs-Auth.php');
+			return 'KickGuest';
+		}
+	}
+	elseif(empty($modSettings['pmxportal_disabled']) && !empty($_REQUEST) && PortaMx_frontactions())
+		return 'PortaMx';
+
+]]></add>
+		</operation>
+
+		<operation>
+			<search position="replace"><![CDATA[
+		// Action and board are both empty... BoardIndex!
+		if (empty($board) && empty($topic))
+		{
+			require_once($sourcedir . '/BoardIndex.php');
+			return 'BoardIndex';
+		}
+]]></search>
+			<add><![CDATA[
+		// Action and board are both empty... BoardIndex!
+		if (empty($board) && empty($topic))
+		{
+			if(empty($modSettings['pmxportal_disabled']))
+				return PortaMx_wireless();
+
+			else
+			{
+				require_once($sourcedir . '/BoardIndex.php');
+				return 'BoardIndex';
+			}
+		}
+]]></add>
+		</operation>
+
+		<operation>
+			<search position="replace"><![CDATA[
+		// Fall through to the board index then...
+		require_once($sourcedir . '/BoardIndex.php');
+		return 'BoardIndex';
+]]></search>
+			<add><![CDATA[
+		// Fall through to the board index then...
+		if(empty($modSettings['pmxportal_disabled']))
+			return 'PortaMx';
+		else
+		{
+			require_once($sourcedir . '/BoardIndex.php');
+			return 'BoardIndex';
+		}
+]]></add>
+		</operation>
+	</file>
+
+	<!-- BoardIndex.php -->
+	<file name="$sourcedir/BoardIndex.php">
+		<operation>
+			<search position="replace"><![CDATA[
+	if (!empty($_GET))
+		$context['robot_no_index'] = true;
+]]></search>
+			<add><![CDATA[
+	//-> PortaMx
+	if (!empty($_GET))
+		$context['robot_no_index'] = (isset($_GET['action']) && $_GET['action'] == 'community') ? false : true;
+	//<- PortaMx
+]]></add>
+		</operation>
+	</file>
+
+	<!-- Display.php -->
+	<file name="$sourcedir/Display.php">
+		<operation>
+			<search position="replace"><![CDATA[
+	// This is just a regular attachment...
+	else
+	{
+		// This checks only the current board for $board/$topic's permissions.
+		isAllowedTo('view_attachments');
+
+		// Make sure this attachment is on this board.
+		// NOTE: We must verify that $topic is the attachment's topic, or else the permission check above is broken.
+		$request = $smcFunc['db_query']('', '
+			SELECT a.id_folder, a.filename, a.file_hash, a.fileext, a.id_attach, a.attachment_type, a.mime_type, a.approved, m.id_member
+			FROM {db_prefix}attachments AS a
+				INNER JOIN {db_prefix}messages AS m ON (m.id_msg = a.id_msg AND m.id_topic = {int:current_topic})
+				INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})
+			WHERE a.id_attach = {int:attach}
+			LIMIT 1',
+			array(
+				'attach' => $_REQUEST['attach'],
+				'current_topic' => $topic,
+			)
+		);
+	}
+]]></search>
+			<add><![CDATA[
+	// This is just a regular attachment...
+	else
+	{
+		//-> PortaMx
+		if(isset($_REQUEST['fld']))
+		{
+			// get group access
+			$request = $smcFunc['db_query']('', '
+					SELECT config
+					FROM {db_prefix}portamx_blocks
+					WHERE active = 1 AND blocktype = {string:blocktyp} AND id = {int:id}',
+				array(
+					'blocktyp' => 'download',
+					'id' => (int) $_REQUEST['fld'],
+				)
+			);
+			if($smcFunc['db_num_rows']($request) > 0)
+			{
+				$row = $smcFunc['db_fetch_assoc']($request);
+				$smcFunc['db_free_result']($request);
+				$cfg = unserialize($row['config']);
+				$acsgrp = (isset($cfg['settings']['download_acs']) && is_array($cfg['settings']['download_acs']) ? $cfg['settings']['download_acs'] : array());
+			}
+			else
+				$acsgrp = array();
+
+			// check if enabled for the usergroup
+			$show = AllowedTo('admin_forum');
+			foreach($acsgrp as $g)
+				$show = (is_numeric($g) && in_array((int) $g, $user_info['groups']) ? true: $show);
+
+			if(!$show)
+				redirectexit($scripturl .'?pmxerror=acs');
+
+			// get the filedata from attach table
+			$request = $smcFunc['db_query']('', '
+				SELECT a.id_folder, a.filename, a.file_hash, a.fileext, a.id_attach, a.attachment_type, a.mime_type, a.approved, m.id_member
+				FROM {db_prefix}attachments AS a
+					INNER JOIN {db_prefix}messages AS m ON (m.id_msg = a.id_msg)
+					INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
+				WHERE a.id_attach = {int:attach}
+				LIMIT 1',
+				array(
+					'attach' => $_REQUEST['id'],
+				)
+			);
+			if ($smcFunc['db_num_rows']($request) == 0)
+				redirectexit($scripturl .'?pmxerror=fail');
+		}
+		// This is just a regular attachment...
+		else
+		{
+			// This checks only the current board for $board/$topic's permissions.
+			isAllowedTo('view_attachments');
+
+			// Make sure this attachment is on this board.
+			// NOTE: We must verify that $topic is the attachment's topic, or else the permission check above is broken.
+			$request = $smcFunc['db_query']('', '
+				SELECT a.id_folder, a.filename, a.file_hash, a.fileext, a.id_attach, a.attachment_type, a.mime_type, a.approved, m.id_member
+				FROM {db_prefix}attachments AS a
+					INNER JOIN {db_prefix}messages AS m ON (m.id_msg = a.id_msg AND m.id_topic = {int:current_topic})
+					INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})
+				WHERE a.id_attach = {int:attach}
+				LIMIT 1',
+				array(
+					'attach' => $_REQUEST['attach'],
+					'current_topic' => $topic,
+				)
+			);
+		}
+	}
+//<- PortaMx
+]]></add>
+		</operation>
+	</file>
+
+	<!-- Load.php -->
+	<file name="$sourcedir/Load.php">
+		<operation>
+			<search position="replace"><![CDATA[
+function loadUserSettings()
+{
+	global $modSettings, $user_settings, $sourcedir, $smcFunc;
+	global $cookiename, $user_info, $language;
+
+	// Check first the integration, then the cookie, and last the session.
+	if (count($integration_ids = call_integration_hook('integrate_verify_user')) > 0)
+]]></search>
+			<add><![CDATA[
+function loadUserSettings($checkOnly = false)
+{
+	global $modSettings, $user_settings, $sourcedir, $smcFunc;
+	global $cookiename, $user_info, $language;
+
+	// Check first the integration, then the cookie, and last the session.
+	if (empty($checkOnly) && count($integration_ids = call_integration_hook('integrate_verify_user')) > 0)
+]]></add>
+		</operation>
+
+		<operation>
+			<search position="replace"><![CDATA[
+		$id_member = !empty($id_member) && strlen($password) == 40 && $login_span > time() ? (int) $id_member : 0;
+	}
+
+	// Only load this stuff if the user isn't a guest.
+	if ($id_member != 0)
+	{
+]]></search>
+			<add><![CDATA[
+		$id_member = !empty($id_member) && strlen($password) == 40 && $login_span > time() ? (int) $id_member : 0;
+	}
+
+	if(!empty($checkOnly))
+		return $id_member;
+
+	// Only load this stuff if the user isn't a guest.
+	if ($id_member != 0)
+	{
+		// PortaMx ecl cookie handling
+		if(!pmx_checkECL_Cookie())
+			pmx_setECL_Cookie();
+
+]]></add>
+		</operation>
+
+		<operation>
+			<search position="replace"><![CDATA[
+function loadSession()
+{
+	global $HTTP_SESSION_VARS, $modSettings, $boardurl, $sc;
+]]></search>
+			<add><![CDATA[
+function loadSession()
+{
+	global $HTTP_SESSION_VARS, $modSettings, $boardurl, $sc;
+
+	// PortaMx ecl cookie handling
+	if(!pmx_checkECL_Cookie() && loadUserSettings(true) == 0)
+		return;
+]]></add>
+		</operation>
+
+		<operation>
+			<search position="replace"><![CDATA[
+	$context['menu_separator'] = !empty($settings['use_image_buttons']) ? ' ' : ' | ';
+	$context['session_var'] = $_SESSION['session_var'];
+	$context['session_id'] = $_SESSION['session_value'];
+]]></search>
+			<add><![CDATA[
+	$context['menu_separator'] = !empty($settings['use_image_buttons']) ? ' ' : ' | ';
+
+	// PortaMx ecl cookie handling
+	$context['session_var'] = isset($_SESSION['session_var']) ? $_SESSION['session_var'] : '';
+	$context['session_id'] = isset($_SESSION['session_value']) ? $_SESSION['session_value'] : '';
+]]></add>
+		</operation>
+
+		<operation>
+			<search position="replace"><![CDATA[
+		// Build up the linktree.
+		$context['linktree'] = array_merge(
+			$context['linktree'],
+			array(array(
+				'url' => $scripturl . '#c' . $board_info['cat']['id'],
+				'name' => $board_info['cat']['name']
+			)),
+]]></search>
+			<add><![CDATA[
+		// Build up the linktree for PortaMx
+		$context['linktree'] = array_merge(
+			$context['linktree'],
+			array(array(
+				'url' => $scripturl . (empty($modSettings['pmxportal_disabled']) && !empty($modSettings['pmx_frontmode']) ? '?action=community;' : '') .'#c' . $board_info['cat']['id'],
+				'name' => $board_info['cat']['name']
+			)),
+]]></add>
+		</operation>
+
+		<operation>
+			<search position="after"><![CDATA[
+	elseif (!empty($modSettings['knownThemes']) && !allowedTo('admin_forum'))
+	{
+		$themes = explode(',', $modSettings['knownThemes']);
+]]></search>
+			<add><![CDATA[
+	//-> PortaMx
+	elseif (!empty($modSettings['pmx_fronttheme']))
+	{
+		if(empty($_REQUEST['action']) && empty($_REQUEST['board']) && empty($_REQUEST['topic']))
+		{
+			$ispagecatart = (!empty($_REQUEST['spage']) || !empty($_REQUEST['cat']) || !empty($_REQUEST['art']));
+			if(empty($ispagecatart))
+				$id_theme = (int) $modSettings['pmx_fronttheme'];
+			elseif(!empty($ispagecatart) && !empty($modSettings['pmx_frontthempg']))
+				$id_theme = (int) $modSettings['pmx_fronttheme'];
+		}
+	}
+	//<- PortaMx
+]]></add>
+		</operation>
+	</file>
+
+	<!-- LogInOut.php -->
+	<file name="$sourcedir/LogInOut.php">
+		<operation>
+			<search position="before"><![CDATA[
+function Login()
+{
+	global $txt, $context, $scripturl;
+]]></search>
+			<add><![CDATA[
+	if(!pmx_checkECL_Cookie())
+		pmx_ECL_Error('login');
+]]></add>
+		</operation>
+
+		<operation>
+			<search position="after"><![CDATA[
+		// Some whitelisting for login_url...
+]]></search>
+			<add><![CDATA[
+		// PortaMx ecl cookie handling
+		pmx_setECL_Cookie();
+]]></add>
+		</operation>
+
+		<operation>
+			<search position="replace"><![CDATA[
+	// Beyond this point you are assumed to be a guest trying to login.
+	if (!$user_info['is_guest'])
+		redirectexit();
+]]></search>
+			<add><![CDATA[
+	// Beyond this point you are assumed to be a guest trying to login.
+	if (!$user_info['is_guest'])
+		redirectexit();
+	elseif(empty($maintenance) && !pmx_checkECL_Cookie())
+		pmx_ECL_Error('login');
+]]></add>
+		</operation>
+
+		<operation>
+			<search position="before"><![CDATA[
+function DoLogin()
+{
+	global $txt, $scripturl, $user_info, $user_settings, $smcFunc;
+	global $cookiename, $maintenance, $modSettings, $context, $sourcedir;
+]]></search>
+			<add><![CDATA[
+	// portamx ecl handling
+	if(!empty($maintenance) && !($user_settings['id_group'] == 1 || in_array(1, explode(',', $user_settings['additional_groups']))))
+		redirectexit();
+	elseif(empty($maintenance) && !pmx_checkECL_Cookie())
+		pmx_ECL_Error('login');
+]]></add>
+		</operation>
+		</file>
+
+	<!-- Poll.php -->
+	<file name="$sourcedir/Poll.php">
+		<operation>
+			<search position="replace"><![CDATA[
+		// Redirect back to the topic so the user can vote again!
+		if (empty($_POST['options']))
+			redirectexit('topic=' . $topic . '.' . $_REQUEST['start']);
+	}
+]]></search>
+			<add><![CDATA[
+		//-> PortaMx
+		if (empty($_POST['options']))
+		{
+			// Redirect to the origin page
+			if(isset($_POST['pmx_votepoll']))
+				redirectexit($_POST['pmx_votepoll']);
+			else
+				// Redirect back to the topic so the user can vote again!
+				redirectexit('topic=' . $topic . '.' . $_REQUEST['start']);
+		}
+	}
+	//<- PortaMx
+]]></add>
+		</operation>
+
+		<operation>
+			<search position="replace"><![CDATA[
+	// Return to the post...
+	redirectexit('topic=' . $topic . '.' . $_REQUEST['start']);
+}
+]]></search>
+			<add><![CDATA[
+	//-> PortaMx
+	if(isset($_POST['pmx_votepoll']))
+		redirectexit($_POST['pmx_votepoll']);
+	else
+		// Return to the post...
+		redirectexit('topic=' . $topic . '.' . $_REQUEST['start']);
+	//<- PortaMx
+}
+]]></add>
+		</operation>
+	</file>
+
+	<!-- Register.php -->
+	<file name="$sourcedir/Register.php">
+		<operation>
+			<search position="after"><![CDATA[
+	// Is this an incoming AJAX check?
+	if (isset($_GET['sa']) && $_GET['sa'] == 'usernamecheck')
+		return RegisterCheckUsername();
+]]></search>
+			<add><![CDATA[
+	if(!pmx_checkECL_Cookie())
+		pmx_ECL_Error('register');
+]]></add>
+		</operation>
+	</file>
+
+	<!-- Security.php -->
+	<file name="$sourcedir/Security.php">
+		<operation>
+			<search position="replace"><![CDATA[
+	// Is it in as $_POST['sc']?
+	if ($type == 'post')
+	{
+]]></search>
+			<add><![CDATA[
+	if(!pmx_checkECL_Cookie())
+		$error = 'session_verify_fail';
+
+	// Is it in as $_POST['sc']?
+	elseif ($type == 'post')
+	{
+]]></add>
+		</operation>
+
+		<operation>
+			<search position="before"><![CDATA[
+	// Just die.
+	if (isset($_REQUEST['xml']))
+		obExit(false);
+]]></search>
+			<add><![CDATA[
+	if(!pmx_checkECL_Cookie() && (empty($user_info['possibly_robot']) || empty($_SESSION)))
+		pmx_ECL_Error('request');
+]]></add>
+		</operation>
+
+		<operation>
+			<search position="replace"><![CDATA[
+		setcookie($cookiename . '_', implode(',', $_SESSION['ban']['cannot_access']['ids']), time() + 3153600, $cookie_url[1], $cookie_url[0], 0);
+]]></search>
+			<add><![CDATA[
+		// PortaMx ecl cookie handling
+		if(!pmx_checkECL_Cookie())
+			setcookie($cookiename . '_', implode(',', $_SESSION['ban']['cannot_access']['ids']), time() + 3153600, $cookie_url[1], $cookie_url[0], 0);
+]]></add>
+		</operation>
+
+		<operation>
+			<search position="before"><![CDATA[
+		loadTemplate('Login');
+		$context['sub_template'] = 'kick_guest';
+		$context['robot_no_index'] = true;
+]]></search>
+			<add><![CDATA[
+		// Init  PortaMx if not loaded
+		if(empty($modSettings['pmxportal_disabled']) && !defined('PortaMx'))
+			PortaMx(true);
+]]></add>
+		</operation>
+	</file>
+
+	<!-- Subs-Auth.php -->
+	<file name="$sourcedir/Subs-Auth.php">
+		<operation>
+			<search position="replace"><![CDATA[
+		// Backup and remove the old session.
+		$oldSessionData = $_SESSION;
+		$_SESSION = array();
+		session_destroy();
+]]></search>
+			<add><![CDATA[
+		// Backup and remove the old session.
+		$oldSessionData = $_SESSION;
+		$_SESSION = array();
+
+		// PortaMx ecl cookie handling
+		if(pmx_checkECL_Cookie())
+			session_destroy();
+]]></add>
+		</operation>
+	</file>
+
+	<!-- Subs.php -->
+	<file name="$sourcedir/Subs.php">
+		<operation>
+			<search position="after"><![CDATA[
+	// Don't mark them as online more than every so often.
+	if (!empty($_SESSION['log_time']) && $_SESSION['log_time'] >= (time() - 8) && !$force)
+		return;
+]]></search>
+			<add><![CDATA[
+	if(!pmx_checkECL_Cookie() && (empty($user_info['possibly_robot']) || empty($_SESSION)))
+		return;
+]]></add>
+		</operation>
+
+		<operation>
+			<search position="before"><![CDATA[
+function parsesmileys(&$message)
+{
+	global $modSettings, $txt, $user_info, $context, $smcFunc;
+	static $smileyPregSearch = array(), $smileyPregReplacements = array();
+]]></search>
+			<add><![CDATA[
+
+	//-> PortaMx
+	if(isset($_GET['action']) && $_GET['action'] == 'jseditor' && isset($_GET['smileyset']))
+		$user_info['smiley_set'] = $_GET['smileyset'];
+	//<- PortaMx
+]]></add>
+		</operation>
+
+		<operation>
+			<search position="before"><![CDATA[
+		if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 2)
+			cache_put_data('menu_buttons-' . implode('_', $user_info['groups']) . '-' . $user_info['language'], $menu_buttons, $cacheTime);
+	}
+]]></search>
+			<add><![CDATA[
+	// Allow editing dynamic buttons easily.
+	call_integration_hook('integrate_dynamic_buttons', array(&$menu_buttons));
+]]></add>
+		</operation>
+	</file>
+
+	<!-- Subs-Boards.php -->
+	<file name="$sourcedir/Subs-Boards.php">
+		<operation>
+			<search position="replace"><![CDATA[
+		if (isset($_SESSION['topicseen_cache']))
+			$_SESSION['topicseen_cache'] = array();
+
+		redirectexit();
+]]></search>
+			<add><![CDATA[
+		if (isset($_SESSION['topicseen_cache']))
+			$_SESSION['topicseen_cache'] = array();
+
+		//-> PortaMx
+		redirectexit(empty($modSettings['pmxportal_disabled']) && !empty($modSettings['pmx_frontmode']) ? 'action=community;' : '');
+		//<- PortaMx
+]]></add>
+		</operation>
+
+		<operation>
+			<search position="replace"><![CDATA[
+		if (empty($clauses))
+			redirectexit();
+]]></search>
+			<add><![CDATA[
+		//-> PortaMx
+		if (empty($clauses))
+			redirectexit(empty($modSettings['pmxportal_disabled']) && !empty($modSettings['pmx_frontmode']) ? 'action=community;' : '');
+		//<- PortaMx
+]]></add>
+		</operation>
+
+		<operation>
+			<search position="replace"><![CDATA[
+		if (empty($boards))
+			redirectexit();
+
+		markBoardsRead($boards, isset($_REQUEST['unread']));
+]]></search>
+			<add><![CDATA[
+		//-> PortaMx
+		if (empty($boards))
+			redirectexit(empty($modSettings['pmxportal_disabled']) && !empty($modSettings['pmx_frontmode']) ? 'action=community;' : '');
+		//<- PortaMx
+
+		markBoardsRead($boards, isset($_REQUEST['unread']));
+]]></add>
+		</operation>
+
+		<operation>
+			<search position="replace"><![CDATA[
+			if (empty($board))
+				redirectexit();
+			else
+				redirectexit('board=' . $board . '.0');
+		}
+		else
+		{
+			if (empty($board_info['parent']))
+				redirectexit();
+			else
+				redirectexit('board=' . $board_info['parent'] . '.0');
+]]></search>
+			<add><![CDATA[
+			if (empty($board))
+				redirectexit(empty($modSettings['pmxportal_disabled']) && !empty($modSettings['pmx_frontmode']) ? 'action=community;' : '');
+			else
+				redirectexit('board=' . $board . '.0');
+		}
+		else
+		{
+			//-> PortaMx
+			if (empty($board_info['parent']))
+				redirectexit(empty($modSettings['pmxportal_disabled']) && !empty($modSettings['pmx_frontmode']) ? 'action=community;' : '');
+			//<- PortaMx
+			else
+				redirectexit('board=' . $board_info['parent'] . '.0');
+]]></add>
+		</operation>
+	</file>
+
+	<!-- Display.template.php -->
+	<file name="$themedir/Display.template.php">
+		<operation>
+			<search position="after"><![CDATA[
+		// Assuming there are attachments...
+		if (!empty($message['attachment']))
+		{
+]]></search>
+			<add><![CDATA[
+		// promote message for PortaMx
+		if(!empty($context['pmx']['can_promote']))
+		{
+			$promo = in_array($message['id'], $context['pmx']['promotes']) ? 'unset' : 'set';
+			echo '	<div class="pmx_promote">
+								<a class="pmx_'. $promo .'_promote" href="'. $scripturl .'?action=promote;topic='. $context['current_topic'] .'.msg'. $message['id'] .'">'. $txt['pmx_'. $promo .'_promote'] .'</a>
+							</div>';
+		}
+]]></add>
+		</operation>
+	</file>
+
+	<!-- Profile.template.php -->
+	<file name="$themedir/Profile.template.php">
+		<operation>
+			<search position="replace"><![CDATA[
+	if (!empty($modSettings['cal_enabled']))
+		echo '
+]]></search>
+			<add><![CDATA[
+//-> PortaMx
+//	if (!empty($modSettings['cal_enabled']))
+//<- PortaMx
+		echo '
+]]></add>
+		</operation>
+	</file>
+
+	<!-- editor.js -->
+	<file name="$themedir/scripts/editor.js">
+		<operation>
+			<search position="replace"><![CDATA[
+	var sText = this.getText(true, !bView).replace(/&#/g, "&#38;#").php_to8bit().php_urlencode();
+
+	this.tmpMethod = sendXMLDocument;
+	this.tmpMethod(smf_prepareScriptUrl(smf_scripturl) + 'action=jseditor;view=' + (bView ? 1 : 0) + ';' + this.opt.sSessionVar + '=' + this.opt.sSessionId + ';xml', 'message=' + sText, this.onToggleDataReceived);
+	delete tmpMethod;
+]]></search>
+			<add><![CDATA[
+	var sText = this.getText(true, !bView).replace(/&#/g, "&#38;#").php_to8bit().php_urlencode();
+
+	//-> PortaMx
+	var smileyset = '';
+	if(document.getElementById('smileyset'))
+		var smileyset = ';smileyset='+ document.getElementById('smileyset').value;
+
+	this.tmpMethod = sendXMLDocument;
+	this.tmpMethod(smf_prepareScriptUrl(smf_scripturl) + 'action=jseditor'+ smileyset +';view=' + (bView ? 1 : 0) + ';' + this.opt.sSessionVar + '=' + this.opt.sSessionId + ';xml', 'message=' + sText, this.onToggleDataReceived);
+	delete tmpMethod;
+	//<- PortaMx
+]]></add>
+		</operation>
+	</file>
+
+	<!-- script.js -->
+	<file name="$themedir/scripts/script.js">
+		<operation>
+			<search position="replace"><![CDATA[
+	if ('oCookieOptions' in this.opt && this.opt.oCookieOptions.bUseCookie)
+	{
+		// Initialize the cookie handler.
+		this.oCookie = new smc_Cookie({});
+
+		// Check if the cookie is set.
+		var cookieValue = this.oCookie.get(this.opt.oCookieOptions.sCookieName)
+		if (cookieValue != null)
+			this.opt.bCurrentlyCollapsed = cookieValue == '1';
+	}
+]]></search>
+			<add><![CDATA[
+	if ('oCookieOptions' in this.opt && this.opt.oCookieOptions.bUseCookie)
+	{
+		//-> PortaMx
+		if('sCookieValue' in this.opt.oCookieOptions)
+			var cookieValue = this.opt.oCookieOptions.sCookieValue;
+		//<- PortaMx
+		else
+		{
+			// Initialize the cookie handler.
+			this.oCookie = new smc_Cookie({});
+
+			// Check if the cookie is set.
+			var cookieValue = this.oCookie.get(this.opt.oCookieOptions.sCookieName)
+			if (cookieValue != null)
+				this.opt.bCurrentlyCollapsed = cookieValue == '1';
+		}
+	}
+]]></add>
+		</operation>
+
+		<operation>
+			<search position="replace"><![CDATA[
+	// Update the cookie, if desired.
+	if ('oCookieOptions' in this.opt && this.opt.oCookieOptions.bUseCookie)
+		this.oCookie.set(this.opt.oCookieOptions.sCookieName, this.bCollapsed ? '1' : '0');
+]]></search>
+			<add><![CDATA[
+	// Update the cookie, if desired.
+	if ('oCookieOptions' in this.opt && this.opt.oCookieOptions.bUseCookie == true)
+	{
+		//-> PortaMx
+		if('sCookieValue' in this.opt.oCookieOptions)
+		{
+			if(!bInit)
+				pmx_setCookie(this.opt.oCookieOptions.sCookieName, this.bCollapsed ? '1' : '0');
+		}
+		//<- PortaMx
+		else
+			this.oCookie.set(this.opt.oCookieOptions.sCookieName, this.bCollapsed ? '1' : '0');
+	}
+]]></add>
+		</operation>
+
+		<operation>
+			<search position="replace"><![CDATA[
+smc_Cookie.prototype.set = function(sKey, sValue)
+{
+	document.cookie = sKey + '=' + encodeURIComponent(sValue);
+}
+]]></search>
+			<add><![CDATA[
+smc_Cookie.prototype.set = function(sKey, sValue)
+{
+	if(typeof(pmx_seteclcook) == 'undefined')
+		document.cookie = sKey + '=' + encodeURIComponent(sValue);
+}
+]]></add>
+		</operation>
+	</file>
+
+	<!-- xml-topic.js -->
+	<file name="$themedir/scripts/topic.js">
+		<operation>
+			<search position="before"><![CDATA[
+		// Move the view to the quick reply box.
+		if (navigator.appName == 'Microsoft Internet Explorer')
+			window.location.hash = this.opt.sJumpAnchor;
+		else
+			window.location.hash = '#' + this.opt.sJumpAnchor;
+]]></search>
+			<add><![CDATA[
+		//-> PortaMx
+		xBarKeys_Status = pmx_xBarKeys;
+		pmx_xBarKeys = false;
+		//<- PortaMx
+]]></add>
+		</operation>
+
+		<operation>
+			<search position="before"><![CDATA[
+	// At least NOW we're in edit mode
+	this.bInEditMode = true;
+]]></search>
+			<add><![CDATA[
+	//-> PortaMx
+	xBarKeys_Status = pmx_xBarKeys;
+	pmx_xBarKeys = false;
+	//<- PortaMx
+]]></add>
+		</operation>
+
+		<operation>
+			<search position="after"><![CDATA[
+	// No longer in edit mode, that's right.
+	this.bInEditMode = false;
+]]></search>
+			<add><![CDATA[
+	//-> PortaMx
+	if(xBarKeys_Status)
+		pmx_xBarKeys = xBarKeys_Status;
+	//<- PortaMx
+]]></add>
+		</operation>
+
+		<operation>
+			<search position="before"><![CDATA[
+	// Send in the XMLhttp request and let's hope for the best.
+	ajax_indicator(true);
+	sendXMLDocument.call(this, smf_prepareScriptUrl(this.opt.sScriptUrl) + "action=jsmodify;topic=" + this.opt.iTopicId + ";" + sSessionVar + "=" + sSessionId + ";xml", x.join("&"), this.onModifyDone);
+]]></search>
+			<add><![CDATA[
+	//-> PortaMx
+	if(xBarKeys_Status)
+		pmx_xBarKeys = xBarKeys_Status;
+	//<- PortaMx
+]]></add>
+		</operation>
+
+		<operation>
+			<search position="before"><![CDATA[
+QuickReply.prototype.swap = function ()
+{
+	document.getElementById(this.opt.sImageId).src = this.opt.sImagesUrl + "/" + (this.bCollapsed ? this.opt.sImageCollapsed : this.opt.sImageExpanded);
+	document.getElementById(this.opt.sContainerId).style.display = this.bCollapsed ? '' : 'none';
+]]></search>
+			<add><![CDATA[
+	//-> PortaMx
+	if(this.bCollapsed)
+	{
+		xBarKeys_Status = pmx_xBarKeys;
+		pmx_xBarKeys = false;
+	}
+	else
+	{
+	if(xBarKeys_Status)
+		pmx_xBarKeys = xBarKeys_Status;
+	}
+	//<- PortaMx
+]]></add>
+		</operation>
+	</file>
+
+	<!-- admin.css -->
+	<file name="$themedir/css/admin.css">
+		<operation error="ignore">
+			<search position="replace"><![CDATA[
+#quick_search form, h3.catbg #quick_search form
+{
+	padding: 7px;
+	line-height: 0.9em;
+	font-size: 0.8em !important;
+}
+]]></search>
+			<add><![CDATA[
+#quick_search form, h3.catbg #quick_search form
+{
+	padding: 5px 0 0 0;
+	line-height: 0.9em;
+	font-size: 0.8em !important;
+}
+]]></add>
+		</operation>
+	</file>
+</modification>

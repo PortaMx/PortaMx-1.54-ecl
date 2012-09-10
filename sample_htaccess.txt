@@ -1,0 +1,8 @@
+# sample .htaccess for PortaMxSEF
+# if you have problem, try to uncomment RewriteBase
+# and replace /forumpath/ with the path to your forum
+RewriteEngine On
+# RewriteBase /forumpath/
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php?q=$1 [L,QSA]

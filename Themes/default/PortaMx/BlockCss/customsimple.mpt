@@ -1,0 +1,136 @@
+/**
+* \file customsimple.mpt
+* Example for a multi part/theme css file
+*
+* \author PortaMx - Portal Management Extension
+* \author Copyright 2008-2012 by PortaMx - http://portamx.com
+* \version 1.51
+* \date 31.08.2012
+*/
+
+/*
+* DEFINITIONS FOR THE CUSTOMER CSS
+* --------------------------------
+*   <class> ... </class>
+*		between these tags, you have to asign your class definitions like:
+*			<keyname>classname</keyname>
+*
+*   optional you can use a theme="id" attribut like:
+*			<keyname theme="1,2">classname</keyname>
+*		or
+*			<keyname theme="^1,^2">classname</keyname>
+*		in this case the class is only used or not(^) used for the defined theme(s).
+*
+*		Follow keynames are legal and overwrite the defaults:
+*			header			- block header bar (title and icons)
+* 		frame				- block frame (top, middle, bottom frame)
+* 		body				- block body, where the content is shown
+*  		bodytext		- body text classes
+*			postheader	- header in postblocks, like boardnews, new_posts
+*			postframe		- frame in postblocks, like boardnews, new_posts
+*			postbody		- body in postblocks, like boardnews, new_posts
+*		Note:
+*			A block can have more keynames, that is dependet on the blocktype.
+*/
+
+<class>
+	<header theme="2">custsimpleheader</header>
+	<frame theme="2">custsimpleframe</frame>
+	<body theme="2">custsimplebody</body>
+</class>
+
+/*
+* HERE STARTS YOUR CSS DEFINITIONS.
+* ---------------------------------
+* All link for grafic elements must be defined as example:
+* background: url(@@/Images/sample.png) no-repeat 100% -10px;
+* The correct link is set dynamically on compile time.
+*/
+
+/* header class */
+.custsimpleheader
+{
+	color: #ffffff;
+	background: url(@@/Images/background.png) repeat-x;
+	height: 31px;
+}
+
+/* header link */
+.custsimpleheader a:hover
+{
+	color: #C7D7E7 !important;
+	text-decoration: none !important;
+}
+.custsimpleheader a:link,
+.custsimpleheader a:visited,
+.custsimpleheader span
+{
+	color: #EFFBB7;
+}
+
+/* header text */
+.custsimpleheader .pmxtitle
+{
+	font-familie: Verdana;
+	font-weight: bold;
+	font-size: 15px;
+}
+
+/* header image */
+.custsimpleheader img.title_images.pmxleft
+{
+	margin: 7px 0 0 7px !important;
+	padding: 0 !important;
+}
+.custsimpleheader img.title_images.pmxright
+{
+	margin: 7px 7px 0 0 !important;
+	padding: 0 !important;
+}
+.custsimpleheader img.ce_images.pmxleft
+{
+	margin: 9px 0 0 7px !important;
+	padding: 0 !important;
+}
+.custsimpleheader img.ce_images.pmxright
+{
+	margin: 9px 7px 0 0 !important;
+	padding: 0 !important;
+}
+
+/* header text align */
+.custsimpleheader .pmxtitle.pmxleft
+{
+	float: left;
+	padding: 5px 5px 0 5px;
+}
+.custsimpleheader .pmxtitle.pmxright
+{
+	float: right;
+	padding: 5px 5px 0 0;
+}
+
+/* frame class */
+.custsimpleframe
+{
+	border: 1px solid #606060;
+	background-color: #20202f;
+	color: #ffffff;
+}
+
+/* body class */
+.custsimplebody
+{
+	color: #ffffff;
+}
+.custsimplebody a
+{
+	color: #c0c000;
+}
+
+/* shoutbox padding */
+.custsimpleframe .shoutbox_round
+{
+	padding: 5px !important;
+}
+/* EOF */

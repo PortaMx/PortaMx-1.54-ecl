@@ -1,0 +1,6 @@
+[center]
+[b]--==[ ATTENTIONE ]==--[/b]
+[b]If you NOT have checked "Remove all data associated with this modification",[br]the PortaMx database tables are NOT removed![/b]
+[/center]
+
+If you want to remove the PortaMx database tables later, run the file [b]dbremove.php[/b] where you find in the archive. Unpack this file and copy it to the forum root. Open a browser window, enter your forum url, add /dbremove.php at the end of line and press enter. If a login screen shown, login as admin. After the run of this script, the database tables are removed.[br][br]

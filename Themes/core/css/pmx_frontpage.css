@@ -1,0 +1,25 @@
+/**
+* \file core/css/pmx_frontpage.css
+* Additional css for fullsize Frontpage
+*
+* \author PortaMx - Portal Management Extension
+* \author Copyright 2008-2012 by PortaMx - http://portamx.com
+* \version 1.51
+* \date 31.08.2012
+*/
+
+body {
+	background: #E5E5E8;
+	font: 95%/90% Verdana, Helvetica, sans-serif;
+	margin: 0;
+	padding: 5px 0px;
+}
+#mainframe
+{
+	font-size: 85%;
+	width: 99%;
+	margin: auto;
+}
+.menu_padding {
+	padding: 0 0 1em 0;
+}

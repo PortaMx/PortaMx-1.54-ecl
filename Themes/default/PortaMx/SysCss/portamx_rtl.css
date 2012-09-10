@@ -1,0 +1,16 @@
+/**
+* \file portamx_rtl.css
+* CSS file for right to left.
+*
+* \author PortaMx - Portal Management Extension
+* \author Copyright 2008-2012 by PortaMx - http://portamx.com
+* \version 1.51
+* \date 31.08.2012
+*/
+.pmx_clickaddnew,.pmx_clickrow,.pmx_filter,.pmx_nofilter{float:left !important;}
+.adm_input span,.adm_check span{float:right !important;}
+.info_border span,.info_border2 span{float:right !important;}
+.pmx_set_promote{background:url(Images/promote.gif) no-repeat 100% 0 !important;}
+.pmx_unset_promote{background:url(Images/promoted.gif) no-repeat 100% 0 !important;}
+.pmx_set_promote,.pmx_unset_promote{padding:1px 21px 1px 0px !important;}
+.pmx_printimg{float:left !important;}

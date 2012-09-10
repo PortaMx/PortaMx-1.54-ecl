@@ -1,0 +1,43 @@
+/**
+* \file default/css/pmx_frontpage.css
+* Additional css for fullsize Frontpage
+*
+* \author PortaMx - Portal Management Extension
+* \author Copyright 2008-2012 by PortaMx - http://portamx.com
+* \version 1.51
+* \date 31.08.2012
+*/
+
+body {
+	background: #FFFFFF url();
+	margin: 0;
+	padding: 0;
+}
+.menu_padding {
+	padding: 0.5em 0 2.5em 0;
+}
+/* Normal, standard links. */
+a:link, a:visited
+{
+	color: #346;
+	text-decoration: none;
+}
+a:hover
+{
+	text-decoration: underline;
+	cursor: pointer;
+}
+
+/* Links that open in a new window. */
+a.new_win:link, a.new_win:visited
+{
+	color: #346;
+	text-decoration: none;
+}
+a.new_win:hover
+{
+	text-decoration: underline;
+}
+#footerarea {
+	padding-top: 1em;
+}

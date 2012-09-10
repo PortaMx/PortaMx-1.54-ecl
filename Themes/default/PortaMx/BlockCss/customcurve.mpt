@@ -1,0 +1,277 @@
+/**
+* \file customcurve.mpt
+* Example for a multi part/theme css file "Curve styled"
+*
+* \author PortaMx - Portal Management Extension
+* \author Copyright 2008-2012 by PortaMx - http://portamx.com
+* \version 1.51
+* \date 31.08.2012
+*/
+
+/*
+* DEFINITIONS FOR THE CUSTOMER CSS
+* --------------------------------
+*   <class> ... </class>
+*		between these tags, you have to asign your class definitions like:
+*			<keyname>classname</keyname>
+*
+*   optional you can use a theme="id" attribut like:
+*			<keyname theme="1,2">classname</keyname>
+*		or
+*			<keyname theme="^1,^2">classname</keyname>
+*		in this case the class is only used or not(^) used for the defined theme(s).
+*
+*		Follow keynames are legal and overwrite the defaults:
+*			header			- block header bar (title and icons)
+* 		frame				- block frame (top, middle, bottom frame)
+* 		body				- block body, where the content is shown
+*  		bodytext		- body text classes
+*			postheader	- header in postblocks, like boardnews, new_posts
+*			postframe		- frame in postblocks, like boardnews, new_posts
+*			postbody		- body in postblocks, like boardnews, new_posts
+*		Note:
+*			A block can have more keynames, that is dependet on the blocktype.
+*/
+
+<class>
+	<header theme="^2">custcurveheader</header>
+	<frame theme="^2">custcurveframe</frame>
+	<postheader theme="^2">custcurveheader</postheader>
+	<postframe theme="^2">custcurveframe</postframe>
+</class>
+
+/*
+* HERE STARTS YOUR CSS DEFINITIONS.
+* ---------------------------------
+* All link for grafic elements must be defined as example:
+* background: url(@@/Images/sample.png) no-repeat 100% -10px;
+* The correct link is set dynamically on compile time.
+*/
+
+/* header class */
+div.custcurveheader
+{
+	padding-left: 9px;
+	margin-bottom: 2px;
+	height: 31px;
+	overflow: hidden;
+	background: url(@@/Images/sample2-fs8.png) no-repeat 0 -40px;
+}
+div.custcurveheader.catbg_grid
+{
+	height: 27px;
+	margin-bottom: 0px;
+}
+
+h3.custcurveheader, h4.custcurveheader
+{
+	padding-right: 9px;
+	overflow: hidden;
+	height: 31px;
+	line-height: 32px;
+	font-size: 1.1em;
+	font-family: Tahoma;
+}
+h3.custcurveheader.catbg_grid, h4.custcurveheader.catbg_grid
+{
+	height: 27px !important;
+}
+h3.custcurveheader, h4.custcurveheader
+{
+	background: url(@@/Images/sample2-fs8.png) no-repeat 100% -5px;
+}
+
+/* header links and text */
+.custcurveheader a:hover
+{
+	color: #C7D7E7 !important;
+	text-decoration: none !important;
+}
+.custcurveheader a:link,
+.custcurveheader a:visited,
+.custcurveheader span
+{
+	color: #EFFBB7;
+}
+
+/* header images */
+.custcurveheader img.pmxleft
+{
+	padding: 0 !important;
+}
+.custcurveheader img.ce_images
+{
+	margin: 8px 1px 0 !important;
+}
+.custcurveheader img.title_images
+{
+	margin: 7px 0 0 0 !important;
+}
+
+/* header text align */
+.custcurveheader span.pmxtitle
+{
+	display: block;
+	white-space: nowrap;
+	overflow: hidden;
+	line-height: 1.3em;
+}
+.custcurveheader .pmxtitle.pmxleft
+{
+	padding: 6px 5px 0 5px;
+	float: left;
+}
+.custcurveheader .pmxtitle.pmxleft.pmxadj
+{
+	padding: 6px 5px 0 0 !important;
+}
+.custcurveheader .pmxtitle.pmxright
+{
+	padding: 6px 5px 0 5px;
+	float: right;
+}
+.custcurveheader .pmxtitle.pmxright.pmxadj
+{
+	padding: 6px 9px 0 7px !important;
+}
+.custcurveheader span.pmxtitle.pmxcenter
+{
+	text-align: center;
+	padding: 6px 9px 0 0;
+}
+.custcurveheader .pmxtitle.pmxcenter.pmxadj_center
+{
+	padding: 6px 5px 0 5px;
+}
+.custcurveheader .pmxtitle.pmxcenter.pmxadj_left
+{
+	padding-right: 22px;
+}
+.custcurveheader .pmxtitle.pmxcenter.pmxadj_right
+{
+	padding-left: 22px;
+}
+
+/* frame class
+Note:
+	the frame class for the top border MUST ends with "_top"
+	and the frame class for bottom border MUST ends with "_bot"
+*/
+.custcurveframe
+{
+	color: #282830 !important;
+}
+.custcurveframe .custcurveheader a:hover
+{
+	color: #C7D7E7;
+	text-decoration: underline !important;
+}
+.custcurveframe .custcurveheader a:link,
+.custcurveframe .custcurveheader a:visited
+{
+	color: #EFFBB7;
+}
+
+.custcurveframe, .windowbg.custcurveframe
+{
+	background: #ffffff;
+	border-left: 1px solid #dfdfdf;
+	border-right: 1px solid #dfdfdf;
+}
+.windowbg2.custcurveframe
+{
+	background: #efefef;
+	border-left: 1px solid #dfdfdf;
+	border-right: 1px solid #dfdfdf;
+}
+
+span.custcurveframe_top
+{
+	margin-top: 0;
+	padding: 0;
+	height: 10px;
+	display: block;
+	padding-left: 10px;
+}
+span.custcurveframe_top, span.windowbg.custcurveframe_top
+{
+	background: url(@@/Images/sample2-fs8.png) 0 -110px no-repeat;
+}
+span.windowbg2.custcurveframe_top
+{
+	background: url(@@/Images/sample2-fs8.png) 0 -180px no-repeat;
+}
+
+span.custcurveframe_top span
+{
+	padding: 0;
+	height: 10px;
+	display: block;
+}
+span.custcurveframe_top  span, span.windowbg.custcurveframe_top  span
+{
+	background: url(@@/Images/sample2-fs8.png) 100% -75px no-repeat;
+}
+span.windowbg2.custcurveframe_top span
+{
+	background: url(@@/Images/sample2-fs8.png) 100% -145px no-repeat;
+}
+
+span.custcurveframe_bot
+{
+	padding: 0;
+	height: 12px;
+	display: block;
+	padding-left: 10px;
+}
+span.custcurveframe_bot, span.windowbg.custcurveframe_bot
+{
+	background: url(@@/Images/sample2-fs8.png) 0 -131px no-repeat;
+}
+span.windowbg2.custcurveframe_bot
+{
+	background: url(@@/Images/sample2-fs8.png) 0 -201px no-repeat;
+}
+
+span.custcurveframe_bot span
+{
+	padding: 0;
+	height: 12px;
+	display: block;
+}
+span.custcurveframe_bot span, span.windowbg.custcurveframe_bot span
+{
+	background: url(@@/Images/sample2-fs8.png) 100% -96px no-repeat;
+}
+span.windowbg2.custcurveframe_bot span
+{
+	background: url(@@/Images/sample2-fs8.png) 100% -166px no-repeat;
+}
+
+/* body class */
+.custcurvebody
+{
+	color: #282830 !important;
+}
+.custcurvebody a:hover
+{
+	color: #30589f !important;
+	text-decoration: underline !important;
+}
+.custcurvebody,
+.custcurvebody a:link,
+.custcurvebody a:visited
+{
+	color: #30589f;
+}
+
+/* smaller hr */
+.custcurvebody hr, .custcurvebody hrcolor
+{
+	padding: 0;
+	margin: 0;
+	background: url(@@/Images/sample2-fs8.png) 100% -215px repeat-x;
+	background-color: transparent !important;
+	height: 4px !important;
+}
+/* EOF */
