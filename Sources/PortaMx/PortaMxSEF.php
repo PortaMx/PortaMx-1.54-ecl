@@ -130,7 +130,7 @@ function pmxsef_convertSEF()
 	// Parse the url
 	if(!empty($_GET['q']))
 	{
-		$_GET = pmxsef_query(rawurldecode(ltrim(str_replace($boardurl, '', $_SERVER['REQUEST_URL']), '/')));
+		$_GET = pmxsef_query(rawurldecode(ltrim($_GET['q'], '/')));
 		$_SERVER['QUERY_STRING'] = pmxsef_build_query($_GET, '', ';');
 
 		// check if the topic subject changed
@@ -159,7 +159,8 @@ function pmxsef_query($query)
 		$act = array_intersect($url_array, $PortaMxSEF['allactions']);
 
 		// check ignore requests
-		if(($tmp = array_intersect(array_keys($url_array), array_keys($PortaMxSEF['ignorerequests']))) && count($tmp) == 1 && ($tmp = current($tmp)) && $url_array[$tmp] == $PortaMxSEF['ignorerequests'][$tmp])
+		$tmp = array_intersect(array_values($url_array), array_keys($PortaMxSEF['ignorerequests']));
+		if(count($tmp) == 1 && $url_array[key($tmp)+1] == $PortaMxSEF['ignorerequests'][current($tmp)])
 			pmxsef_redir_perm($_SERVER['REQUEST_URL']);
 
 		// ignore action ?
