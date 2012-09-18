@@ -866,8 +866,8 @@ function PortaMx_getSettings($from_eclinit = false)
 	$context['pmx_style_isCore'] = (bool) (stripos(str_replace('\\', '/', $settings['theme_dir'] .'/'), '/core/') !== false);
 
 	// customer action vars
-	$context['pmx']['ca_find'] = array('/([\@\s\r\n\t]+)/', '/([\^\,]+|)([a-zA-Z0-9\=\.\-\_\*\?\[\]\;\:\&\*\?\^\|]+)/e');
-	$context['pmx']['ca_repl'] = array('', "strpos('\\2',':')===false?'\\1:\\2':'\\0'");
+	$context['pmx']['ca_find'] = array('/([\@\s\r\n\t]+)/', '/(\[host\=[a-zA-Z0-9\.\-\_\*\?\,\^]+\])/', '/([\^\,]+|)([a-zA-Z0-9\=\.\-\_\*\?\[\]\;\:\&\*\?\^\|]+)/e');
+	$context['pmx']['ca_repl'] = array('', '', "strpos('\\2',':')===false?'\\1:\\2':'\\0'");
 	$context['pmx']['ca_grep'] = '/(\^|)(a:|c:|p:|:|)([\&\^\|]+|)([a-zA-Z0-9\=\.\-\_\*\?\[\]\;]+)/';
 	$context['pmx']['ca_keys'] = array('action' => ':', 'art' => 'a:', 'cat' => 'c:', 'child' => 'c:', 'spage' => 'p:');
 

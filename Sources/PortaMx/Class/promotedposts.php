@@ -398,7 +398,7 @@ class pmxc_promotedposts extends PortaMxC_SystemBlock
 			while(!empty($this->half))
 			{
 				list($pid, $post) = each($this->posts);
-				$this->pmxc_ShowPost($pid, $post, $isEQ, false);
+				$this->pmxc_ShowPost($pid, $post, $isEQ, $this->half == 1);
 				next($this->posts);
 				$this->half--;
 				$this->is_last--;

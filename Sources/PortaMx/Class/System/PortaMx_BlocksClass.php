@@ -145,24 +145,28 @@ class PortaMxC_Blocks
 	{
 		global $scripturl, $context, $modSettings;
 
-		if(isset($_GET['pg']) && is_array($_GET['pg']) && array_key_exists($this->cfg['uniID'], $_GET['pg']))
+		// hide pageindex if only one page..
+		if($items > $pageitems)
 		{
-			$page = $_GET['pg'][$this->cfg['uniID']];
-			unset($_GET['pg'][$this->cfg['uniID']]);
-			$this->startpage = $page;
-			pmx_setcookie('pgidx_'. $this->cfg['uniID'], $page);
-		}
-		elseif(($cook = pmx_getcookie('pgidx_'. $this->cfg['uniID'])) && !is_null($cook))
-			$this->startpage = $cook;
-		else
-			$this->startpage = 0;
+			if(isset($_GET['pg']) && is_array($_GET['pg']) && array_key_exists($this->cfg['uniID'], $_GET['pg']))
+			{
+				$page = $_GET['pg'][$this->cfg['uniID']];
+				unset($_GET['pg'][$this->cfg['uniID']]);
+				$this->startpage = $page;
+				pmx_setcookie('pgidx_'. $this->cfg['uniID'], $page);
+			}
+			elseif(($cook = pmx_getcookie('pgidx_'. $this->cfg['uniID'])) && !is_null($cook))
+				$this->startpage = $cook;
+			else
+				$this->startpage = 0;
 
-		$topfragment = !empty($context['pmx']['settings']['topfragment']) ? '#top'. $this->cfg['uniID'] : '';
-		$cururl = preg_replace('~pg\[[a-zA-Z0-9\-)+\]\=[0-9\;]+~', '', getCurrentUrl(true)) .'pg['. $this->cfg['uniID'] .']=%1$d'. $topfragment;
-		$this->postspage = $pageitems;
-		$this->pageindex = $this->pmxc_makePageIndex($cururl, $this->startpage, $items, $this->postspage);
-		if(!empty($context['pmx']['settings']['restoretop']))
-			$this->pageindex = str_replace('<a', '<a onclick="pmxWinGetTop(\''. $this->cfg['uniID'] .'\')"', $this->pageindex);
+			$topfragment = !empty($context['pmx']['settings']['topfragment']) ? '#top'. $this->cfg['uniID'] : '';
+			$cururl = preg_replace('~pg\[[a-zA-Z0-9\-)+\]\=[0-9\;]+~', '', getCurrentUrl(true)) .'pg['. $this->cfg['uniID'] .']=%1$d'. $topfragment;
+			$this->postspage = $pageitems;
+			$this->pageindex = $this->pmxc_makePageIndex($cururl, $this->startpage, $items, $this->postspage);
+			if(!empty($context['pmx']['settings']['restoretop']))
+				$this->pageindex = str_replace('<a', '<a onclick="pmxWinGetTop(\''. $this->cfg['uniID'] .'\')"', $this->pageindex);
+		}
 	}
 
 	/**

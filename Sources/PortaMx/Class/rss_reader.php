@@ -173,7 +173,7 @@ class pmxc_rss_reader extends PortaMxC_SystemBlock
 				while(!empty($this->half))
 				{
 					list($pid, $post) = each($this->rsscontent);
-					$this->pmxc_ShowPost($pid, $post, $isEQ, false);
+					$this->pmxc_ShowPost($pid, $post, $isEQ, $this->half == 1);
 					next($this->rsscontent);
 					$this->half--;
 					$this->is_last--;
