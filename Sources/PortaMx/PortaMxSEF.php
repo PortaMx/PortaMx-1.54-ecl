@@ -61,7 +61,7 @@ function pmxsef_convertSEF()
 		'pmxextra' => array(
 			'all' => array('paneloff','panelon','blockoff','blockon','show'),
 			'save' => array('rply', 'new'),
-      'view' => array('cfr')),
+			'view' => array('sa', 'cfr')),
 	);
 
 	$PortaMxSEF['allactions'] = array_merge($PortaMxSEF['actions'], $PortaMxSEF['ignoreactions'], array_keys($PortaMxSEF['aliasactions']));
@@ -130,7 +130,7 @@ function pmxsef_convertSEF()
 	// Parse the url
 	if(!empty($_GET['q']))
 	{
-		$_GET = pmxsef_query(rawurldecode(ltrim($_GET['q'], '/')));
+		$_GET = pmxsef_query(rawurldecode(ltrim(str_replace($boardurl, '', $_SERVER['REQUEST_URL']), '/')));
 		$_SERVER['QUERY_STRING'] = pmxsef_build_query($_GET, '', ';');
 
 		// check if the topic subject changed
@@ -1009,7 +1009,7 @@ function getSingleKeyParams(&$url, &$result)
 		foreach($PortaMxSEF['singletoken'] as $key)
 		{
 			$pos = array_search($key, $url);
-			if($pos !== false && (array_key_exists($key, $PortaMxSEF['pmxextra']) && count(array_intersect($PortaMxSEF['pmxextra'][$key], $url)) > 0) === false)
+			if($pos !== false && array_key_exists($key, $PortaMxSEF['pmxextra']) && isset($url[$pos -1]) && array_search($url[$pos -1], $PortaMxSEF['pmxextra'][$key]) === false)
 			{
 				$result[$key] = '';
 				array_splice($url, $pos, 1);
