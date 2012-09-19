@@ -60,7 +60,7 @@ function pmxsef_convertSEF()
 		'ssefspace' => trim($modSettings['pmxsef_ssefspace']),
 		'pmxextra' => array(
 			'all' => array('paneloff','panelon','blockoff','blockon','show'),
-			'save' => array('rply', 'new'),
+			'save' => array('rply', 'new', 'cont'),
 			'view' => array('sa', 'cfr')),
 	);
 
