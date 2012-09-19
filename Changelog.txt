@@ -1,3 +1,10 @@
+PortaMx v1.51 - 18 Sep 2012
+---------------------------
+# Pageindex not show if only one page (PortaMx_BlocksClass.php)
+# remove additonal space between bottom block and Pageindex on two column view (boardnews.php, boardnewsmult.php, newposts.php, promoteposts.php, rss_reader.php)
+# modify the Subforums handling for customer actions, the syntax is now [host=name,name] (LoadData.php)
+# fixed SEF issues decode sef url and ignore url part (PortaMxSEF.php)
+
 Portamx v1.51 - August 2012
 ---------------------------
 fixed: multibyte utf8 problem in the shoutbox (shoutbox.php, shoutbox_adm.php, Admin_Blocks.php)
