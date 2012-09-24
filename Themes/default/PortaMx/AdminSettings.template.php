@@ -104,7 +104,7 @@ function template_main()
 		if(empty($context['pmx_style_isCore']))
 		{
 			echo '
-			<div id="adm_submenus" style="margin-top:1.1em;height:2.8em;overflow:hidden;">
+			<div id="adm_submenus" style="margin-top:1.1em;margin-bottom:6px;overflow:hidden;">
 				<ul class="dropmenu">';
 
 			foreach($MenuTabs as $name => $desc)
