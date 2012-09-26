@@ -2261,6 +2261,9 @@ function pmx_teasegetchars($text, $wordcount)
 		}
 		$text = pmx_tease_settags($smcFunc['substr']($text, 0, $wordcount), $tags);
 	}
+	else
+		$text = $smcFunc['substr']($text, 0, $wordcount);
+
 	$context['pmx']['is_teased'] = pmx_teasecountchars($text);
 
 	return $text;
