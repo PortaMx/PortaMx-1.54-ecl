@@ -30,7 +30,7 @@ $txt['pmx_settings_panelpadding'] = 'Padding between panels:';
 $txt['pmx_settings_paneloverflow'] = 'Action on Panel size overflow:';
 $txt['pmx_settings_download'] = 'Show download button on Menubar:';
 $txt['pmx_settings_download_action'] = 'Action name for download button:';
-$txt['pmx_settings_download_acs'] = 'Membergroups they can see the download button:';
+$txt['pmx_settings_download_acs'] = 'Membergroups that can see the download button:';
 $txt['pmx_settings_other_actions'] = 'Request names they handled as Forum request:';
 $txt['pmx_settings_blockcachestats'] = 'Show the pmx-cache status in the footer:';
 $txt['pmx_settings_hidecopyright'] = 'PortaMx copyright removal codekey:';
@@ -119,11 +119,11 @@ $txt['pmx_settings_promote_messages'] = 'Currently promoted messages:';
 
 // access settings
 $txt['pmx_access_settings'] = 'Access settings';
-$txt['pmx_access_promote'] = 'Membergroups they can promote posts:';
-$txt['pmx_access_articlecreate'] = 'Membergroups they can create and write articles:';
-$txt['pmx_access_articlemoderator'] = 'Membergroups they can moderate and approve articles:';
-$txt['pmx_access_blocksmoderator'] = 'Membergroups they can moderate blocks in enabled panels:';
-$txt['pmx_access_pmxadmin'] = 'Membergroups they can Administrate the entire Portal:';
+$txt['pmx_access_promote'] = 'Membergroups that can promote posts:';
+$txt['pmx_access_articlecreate'] = 'Membergroups that can create and write articles:';
+$txt['pmx_access_articlemoderator'] = 'Membergroups that can moderate and approve articles:';
+$txt['pmx_access_blocksmoderator'] = 'Membergroups that can moderate blocks in enabled panels:';
+$txt['pmx_access_pmxadmin'] = 'Membergroups that can Administrate the entire Portal:';
 
 // pmxsef settings
 $txt['pmx_sef_engine'] = '<b>The SEF engine requires mod_rewrite or URL Rewrite/web.config (IIS7) support.</b>';

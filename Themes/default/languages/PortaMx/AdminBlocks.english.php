@@ -316,7 +316,7 @@ $txt['pmx_shoutbox_collapse'] = 'Collapse the input box initially:';
 $txt['pmx_shoutbox_collapsehelp'] = 'If checked, the Shout input box is normally collapsed and is open with a click on the "Shout!" button.';
 $txt['pmx_shoutbox_reverse'] = 'Reverse shouts (show last at bottom):';
 $txt['pmx_shoutbox_allowedit'] = 'User can edit and delete own shouts:';
-$txt['pmx_shoutbox_canshout'] = 'Select the user groups they can shout';
+$txt['pmx_shoutbox_canshout'] = 'Select the user groups that can shout';
 
 // Category
 $txt['pmx_catblock_cats'] = 'Choose the Category:';
