@@ -7,8 +7,7 @@
 * \version 1.51
 * \date 31.08.2012
 */
-#ecl_outer
-{
+#ecl_outer {
 	position: fixed;
 	top: 1px;
 	left: 2px;
@@ -22,16 +21,14 @@
 	-moz-border-radius: 0.6em;
 	-webkit-border-radius: 0.6em;
 }
-#ecl_outer select
-{
+#ecl_outer select {
 	border: solid 1px #aaa;
 	background: #e0e0e0;
 	border-radius: 0.3em;
 	-moz-border-radius: 0.3em;
 	-webkit-border-radius: 0.3em;
 }
-#ecl_outer input
-{
+#ecl_outer input {
 	padding: 0px 10px 2px 10px;
 	font-weight: bold;
 	cursor: pointer;
@@ -42,40 +39,39 @@
 	-webkit-border-radius: 0.3em;
 	cursor: pointer;
 }
-#ecl_outer input:hover
-{
+#ecl_outer input:hover {
 	background: #cee7ff;
 }
-#ecl_outer, #ecl_privacy td
-{
+#ecl_outer, #ecl_privacy td {
 	color: #000000;
 	font-size: 1.0em;
 	font-family: "Verdana", "Arial", "Helvetica", sans-serif;
 	line-height: 1.3em;
 }
-#ecl_privacy td
-{
+#ecl_privacy td {
 	padding: 3px 10px 3px 2px;
 }
-#ecl_privacy td strong
-{
-	text-decoration: underline;
+#ecl_privacy td div {
+	border-bottom: 1px solid #505050;
 }
-#ecl_privacy p
-{
+#ecl_privacy p {
 	margin-top: 0px;
 }
-#ecl_privacy div
-{
-	max-height: 450px;
+#ecl_privacytext span strong {
+	border-bottom: 1px solid #505050;
+}
+#ecl_privacy div {
 	overflow: auto;
 }
-#ecl_privacy a.ecl_link:link, #ecl_privacy a.ecl_link:visited
-{
+#ecl_privacy a.ecl_link:link,
+#ecl_privacy a.ecl_link:visited {
 	color: #3030a0;
 	cursor: pointer;
 }
-#ecl_privacy a.ecl_link:hover
-{
+#ecl_privacy a.ecl_link:hover {
 	text-decoration: underline;
+}
+#ecl_privacy hr {
+	color: #c0c0c0;
+	background-color: #c0c0c0;
 }

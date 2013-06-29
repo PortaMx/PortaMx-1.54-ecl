@@ -921,8 +921,8 @@ function getUserName($id)
 	if(!empty($id))
 	{
 		getUserNameList(array($id));
-		if(!empty($PortaMxSEF['UserNameList'][$id]))
-			return $PortaMxSEF['UserNameList'][$id] .'.'. $id .'/';
+		if(isset($PortaMxSEF['UserNameList'][$id]))
+			return (empty($PortaMxSEF['UserNameList'][$id]) ? 'u' : $PortaMxSEF['UserNameList'][$id]) .'.'. $id .'/';
 	}
 	return '';
 }

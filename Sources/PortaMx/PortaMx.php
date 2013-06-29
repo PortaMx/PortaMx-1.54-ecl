@@ -234,8 +234,14 @@ function PortaMx($doinit = false)
 		$context['template_layers'][] = 'portamx';
 	}
 
-	// Load the Frame template and create the linktree
+	// Load the Frame template
 	loadTemplate($context['pmx_templatedir'] .'Frames');
+
+	// supress these links if ECL not accepted
+	if(!empty($rqaction) && !pmx_checkECL_Cookie() && in_array($rqaction, array('calendar', 'markasread', 'profile', 'search', 'stats', 'mlist', 'who')))
+		pmx_ECL_Error('request');
+
+	// Create the linktree
 	return pmx_MakeLinktree();
 }
 

@@ -2169,32 +2169,25 @@ function PortaMx_Tease_posts($content, $wordcount, $morelink = '', $remtags = fa
 		$context['pmx']['is_teased'] = $PmxTeaseCount($content);
 		$teased = true;
 	}
-	elseif($PmxTeaseCount($content) > $wordcount)
+	else
 	{
-		$content = $PmxTeaseShorten($content, $wordcount);
-		$teased = true;
+		if(($contentlen = $PmxTeaseCount($content)) > $wordcount)
+		{
+			$content = $PmxTeaseShorten($content, $wordcount);
+			$teased = true;
+		}
 	}
 
 	if(!empty($teased))
 	{
+		// close open tags
+		$content = pmx_tease_closetags($content);
+
+		// get the teased length
+		$context['pmx']['is_teased'] = $PmxTeaseCount($content);
+
 		// insert teaser mark [...]
 		$content .= '<span class="pmx_tease"'. sprintf($txt['pmx_teaserinfo'][$teaseMode], $context['pmx']['is_teased'], $contentlen) .'> [...]</span>';
-
-		// find not closed tags
-		preg_match_all('~<(\w+)[^>]*>~s', $content, $open);
-		preg_match_all('~<\/(\w+)[^>]*>~s', $content, $closed);
-		foreach($open[1] as $i => $tag)
-		{
-			if(substr($open[0][$i], -2, 2) == '/>')
-				unset($open[1][$i]);
-			elseif(($fnd = array_search($tag, $closed[1])) !== false)
-			{
-				unset($closed[1][$fnd]);
-				unset($open[1][$i]);
-			}
-		}
-		foreach(array_reverse($open[1]) as $element)
-			$content .= "</$element>";
 
 		if(!empty($morelink))
 			$content .= $morelink;
@@ -2206,11 +2199,13 @@ function PortaMx_Tease_posts($content, $wordcount, $morelink = '', $remtags = fa
 }
 
 /**
-* get word cont for post_teaser.
+* get word count for post_teaser.
 */
 function pmx_teasecountwords($text)
 {
-	return count(preg_split('/\s+/', preg_replace('/<[^>]*>/', '', $text)));
+	$pmx_transchr = array_flip(get_html_translation_table(HTML_SPECIALCHARS, ENT_QUOTES)) + array('&#039;' => '\'', '&nbsp;' => ' ');
+//	$text = preg_replace(array('/(\S)(<br[^>]*>)(\S)/e', '/([a-zA-Z0-9])(\/)(\S)/e'), array("'\\1\\2 \\3'", "'\\1 \\2\\3'"), $text);
+	return count(preg_split('/\s+/', preg_replace('/<[^>]*>/', '', strtr($text, $pmx_transchr))));
 }
 
 /**
@@ -2220,27 +2215,47 @@ function pmx_teasecountchars($text)
 {
 	global $smcFunc;
 
-	return $smcFunc['strlen'](un_htmlspecialchars(preg_replace('/<[^>]*>/', '', $text)));
+	$pmx_transchr = array_flip(get_html_translation_table(HTML_SPECIALCHARS, ENT_QUOTES)) + array('&#039;' => '\'', '&nbsp;' => ' ');
+	return $smcFunc['strlen'](strtr(preg_replace('/<[^>]*>/', '', $text), $pmx_transchr));
 }
 
 /**
-* get a shorten wordcont string for post_teaser.
+* get a shorten wordcount string for post_teaser.
 */
 function pmx_teasegetwords($text, $wordcount)
 {
-	global $smcFunc, $context;
+	global $context;
 
+	$pmx_transchr = array_flip(get_html_translation_table(HTML_SPECIALCHARS, ENT_QUOTES)) + array('&#039;' => '\'', '&nbsp;' => ' ');
+	$text = preg_replace('/(\S)(<br[^>]*>)(\S)/e', "'\\1\\2 \\3'", $text);
 	$tags = pmx_tease_gettags($text);
-	$words = preg_split('/\s+/', $text, $wordcount +1);
-	unset($words[count($words) -1]);
-	$text = pmx_tease_settags(implode(' ', $words), $tags);
-	$context['pmx']['is_teased'] = pmx_teasecountwords($text);
+	$text = preg_replace('/([a-zA-Z0-9])(\/)(\S)/e', "'\\1 \\2\\3'", $text);
+	$words = preg_split('/ /', $text);
+	$addwords = 0;
+	foreach($words as $i => $word)
+	{
+		$addwords += intval(trim(strtr($word, $pmx_transchr)) == '');
+		if($i == $wordcount)
+			break;
+	}
+	$wordcount += $addwords;
+	$words = preg_split('/ /', $text, $wordcount+1);
+	$words[$wordcount-1] = preg_replace('/<[^>]*>/', '', $words[$wordcount-1]);
+	unset($words[$wordcount]);
+
+	$text = '';
+	foreach($words as $i => $word)
+		$text .= isset($words[$i+1]) && !empty($words[$i+1]) && $words[$i+1]{0} == '/' ? $word : $word .' ';
+	unset($words);
+
+	$text = pmx_tease_settags(rtrim($text), $tags);
+	$text = preg_replace('/(\S)(<br[^>]*>)(" ")/e', "'\\1\\2'", $text);
 
 	return $text;
 }
 
 /**
-* get a shorten charcont string for post_teaser.
+* get a shorten charcount string for post_teaser.
 */
 function pmx_teasegetchars($text, $wordcount)
 {
@@ -2249,22 +2264,14 @@ function pmx_teasegetchars($text, $wordcount)
 	$tags = pmx_tease_gettags($text);
 	if(!empty($tags))
 	{
-		if(preg_match_all('/<[0-9]+>/', utf8_decode(un_htmlspecialchars($text)), $repl, PREG_OFFSET_CAPTURE) > 0)
+		$pmx_transchr = array_flip(get_html_translation_table(HTML_SPECIALCHARS, ENT_QUOTES)) + array('&#039;' => '\'', '&nbsp;' => ' ');
+		if(preg_match_all('/<[0-9]+>/', utf8_decode(strtr($text, $pmx_transchr)), $repl, PREG_OFFSET_CAPTURE) > 0)
 		{
 			foreach($repl[0] as $nt)
-			{
-				if($nt[1] < $wordcount)
-					$wordcount += strlen($nt[0]);
-				else
-					break;
-			}
+				if($nt[1] < $wordcount) $wordcount += strlen($nt[0]); else break;
 		}
 		$text = pmx_tease_settags($smcFunc['substr']($text, 0, $wordcount), $tags);
 	}
-	else
-		$text = $smcFunc['substr']($text, 0, $wordcount);
-
-	$context['pmx']['is_teased'] = pmx_teasecountchars($text);
 
 	return $text;
 }
@@ -2276,10 +2283,7 @@ function pmx_tease_gettags(&$text)
 {
 	preg_match_all('~<[^>]*>~si', $text, $tags);
 	foreach($tags[0] as $i => $tag)
-	{
-		$repl = '<'. strval($i) .'>';
-		$text = substr_replace($text, $repl, strpos($text, $tag), strlen($tag));
-	}
+		$text = substr_replace($text, '<'. $i .'>', strpos($text, $tag), strlen($tag));
 
 	return $tags[0];
 }
@@ -2289,6 +2293,9 @@ function pmx_tease_gettags(&$text)
 */
 function pmx_tease_settags($text, $tags)
 {
+	global $smcFunc;
+
+	$text = rtrim($text);
 	foreach($tags as $i => $tag)
 	{
 		$repl = '<'. strval($i) .'>';
@@ -2296,6 +2303,31 @@ function pmx_tease_settags($text, $tags)
 			break;
 		$text = substr_replace($text, $tag, strpos($text, $repl), strlen($repl));
 	}
+
+	return $text;
+}
+
+/**
+* close open tags in a post_teaser block.
+*/
+function pmx_tease_closetags($text)
+{
+	preg_match_all('~<(\w+)[^>]*>~s', $text, $open);
+	preg_match_all('~<\/(\w+)[^>]*>~s', $text, $closed);
+
+	foreach($open[1] as $i => $tag)
+	{
+		if(substr($open[0][$i], -2, 2) == '/>')
+			unset($open[1][$i]);
+		elseif(($fnd = array_search($tag, $closed[1])) !== false)
+		{
+			unset($closed[1][$fnd]);
+			unset($open[1][$i]);
+		}
+	}
+
+	foreach(array_reverse($open[1]) as $element)
+		$text .= "</$element>";
 
 	return $text;
 }

@@ -5,12 +5,15 @@
 *
 * \author PortaMx - Portal Management Extension
 * \author Copyright 2008-2012 by PortaMx - http://portamx.com
+* \author Copyright 2008-2012 by PortaMx - http://portamx.com
 * \version 1.51
 * \date 31.08.2012
 */
 function template_eclnonemodal_above()
 {
 	global $context, $modSettings, $scripturl, $settings, $language, $cookiename, $txt;
+
+	$replaces = array('@host@' => $_SERVER['SERVER_NAME'], '@cookie@' => $cookiename, '@site@' => $context['forum_name']);
 
 	echo '
 	<div id="ecl_outer">';
@@ -44,6 +47,7 @@ function template_eclnonemodal_above()
 				if(document.getElementById("ecl_privacy"))
 				{
 					document.getElementById("ecl_privacy").style.top = document.getElementById("ecl_outer").offsetHeight + "px";
+					document.getElementById("ecl_privacytext").style.height = (window.innerHeight - document.getElementById("ecl_outer").offsetHeight) - 25 +"px";
 					document.getElementById("ecl_privacy").style.display = document.getElementById("ecl_privacy").style.display == "" ? "none" : "";
 				}
 			}
@@ -53,8 +57,55 @@ function template_eclnonemodal_above()
 
 	$privacyfile = $settings['default_theme_dir'] .'/languages/PortaMx/ecl_privacynotice.'. $currlang .'.php';
 	if(file_exists($privacyfile))
+	{
+		include_once($privacyfile);
+
 		echo '
-			<div>'. str_replace('@host@', $_SERVER['SERVER_NAME'], str_replace('@cookie@', $cookiename, file_get_contents($privacyfile))) .'</div>';
+			<div id="ecl_privacytext">
+			'. strtr($txt['pmx_ecl_header'], $replaces) .'
+				<table cellspacing="0" cellpadding="0" width="100%" border="0">';
+
+		foreach($txt['pmx_ecl_headrows'] as $ecltextrows)
+		{
+			echo '
+					<tr>';
+
+			foreach($ecltextrows as $ecltext)
+				echo '
+						<td valign="top">'. strtr($ecltext, $replaces) .'</td>';
+
+			echo '
+					</tr>';
+		}
+
+		echo '
+				</table>
+				<br />';
+
+		echo '
+			'. $txt['pmx_ecl_footertop'] .'
+				<table cellspacing="0" cellpadding="0" width="100%" border="0">';
+
+		foreach($txt['pmx_ecl_footrows'] as $ecltextrows)
+		{
+			echo '
+					<tr>';
+
+			foreach($ecltextrows as $ecltext)
+				echo '
+						<td valign="top">'. $ecltext .'</td>';
+
+			echo '
+					</tr>';
+		}
+
+		echo '
+				</table>';
+
+		echo '
+			'. $txt['pmx_ecl_footer'] .'
+			</div>';
+	}
 	else
 		echo '
 			<div>'. $txt['pmxelc_privacy_failed'] .'</div>';
