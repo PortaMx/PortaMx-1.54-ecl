@@ -473,7 +473,22 @@ function PortaMx_AdminArticles()
 									'updated' => 'int',
 									'updatedby' => 'int',
 								),
-								$article,
+								array(
+									$article['id'],
+									$article['name'],
+									$article['catid'],
+									$article['acsgrp'],
+									$article['ctype'],
+									$article['config'],
+									$article['content'],
+									$article['active'],
+									$article['owner'],
+									$article['created'],
+									$article['approved'],
+									$article['approvedby'],
+									$article['updated'],
+									$article['updatedby'],
+								),
 								array()
 							);
 

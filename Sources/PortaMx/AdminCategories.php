@@ -292,8 +292,17 @@ function PortaMx_AdminCategories()
 							'artsort' => 'string',
 							'config' => 'string',
 						),
-						$category,
-						array()
+						array(
+							$category['id'],
+							$category['name'],
+							$category['parent'],
+							$category['level'],
+							$category['catorder'],
+							$category['acsgrp'],
+							$category['artsort'],
+							$category['config'],
+						),
+						array('id')
 					);
 
 					// clear cached blockd
@@ -428,8 +437,17 @@ function pmx_move_cat($id, $place, $toid)
 			'artsort' => 'string',
 			'config' => 'string',
 		),
-		$movecat,
-		array()
+		array(
+			$movecat['id'],
+			$movecat['name'],
+			$movecat['parent'],
+			$movecat['level'],
+			$movecat['catorder'],
+			$movecat['acsgrp'],
+			$movecat['artsort'],
+			$movecat['config'],
+		),
+		array('id')
 	);
 
 	// cleanup..

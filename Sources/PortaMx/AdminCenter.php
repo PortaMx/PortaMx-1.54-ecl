@@ -760,7 +760,7 @@ function ReadLiveInfo()
 						'liveinfo',
 						serialize($info),
 					),
-					array('liveinfo')
+					array('varname')
 				);
 		}
 	}

@@ -464,14 +464,14 @@ function PortaMx_AdminBlocks()
 							$request = $smcFunc['db_query']('', '
 								SELECT MAX(a.id), MAX(b.pos)
 								FROM {db_prefix}portamx_blocks as a
-                LEFT JOIN {db_prefix}portamx_blocks as b ON(b.side = {string:side})
-                GROUP BY b.side',
+								LEFT JOIN {db_prefix}portamx_blocks as b ON(b.side = {string:side})
+								GROUP BY b.side',
 								array('side' => $block['side'])
 							);
 							list($dbid, $dbpos) = $smcFunc['db_fetch_row']($request);
-              $smcFunc['db_free_result']($request);
+							$smcFunc['db_free_result']($request);
 							$block['id'] = strval(1 + ($dbid === null ? 0 : $dbid));
-              $block['pos'] = strval(1 + ($dbpos === null ? 0 : $dbpos));
+							$block['pos'] = strval(1 + ($dbpos === null ? 0 : $dbpos));
 						}
 
 						// now save all data
@@ -488,8 +488,18 @@ function PortaMx_AdminBlocks()
 								'config' => 'string',
 								'content' => 'string',
 							),
-							$block,
-							array()
+							array(
+								$block['id'],
+								$block['side'],
+								$block['pos'],
+								$block['active'],
+								$block['cache'],
+								$block['blocktype'],
+								$block['acsgrp'],
+								$block['config'],
+								$block['content'],
+							),
+							array('id')
 						);
 
 						// clear all cache data

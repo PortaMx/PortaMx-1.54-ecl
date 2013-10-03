@@ -92,6 +92,10 @@ class PortaMxC_Blocks
 				if($this->visible && $context['pmx']['settings']['frontpage'] != 'none' && $this->cfg['side'] == 'front')
 					$context['pmx']['showhome'] += intval(!isset($this->cfg['config']['ext_opts']['pmxact']) || (isset($this->cfg['config']['ext_opts']['pmxact']) && (is_null($this->cfg['config']['ext_opts']['pmxact']) || (is_array($this->cfg['config']['ext_opts']['pmxact']) && in_array('frontpage=1', $this->cfg['config']['ext_opts']['pmxact'])))));
 
+				// disable frontpage blocks before init if the frontpage not shown
+				if($this->visible && $this->cfg['side'] == 'front' && empty($context['pmx']['pageReq']) && !empty($_GET))
+					$this->visible = false;
+
 				// hide frontblock on pagerequest?
 				if($this->visible && $this->cfg['side'] == 'front' && (array_key_exists('spage', $context['pmx']['pageReq']) || array_key_exists('cat', $context['pmx']['pageReq'])))
 					$this->visible = (empty($this->cfg['config']['frontplace']) || (!empty($this->cfg['config']['frontplace']) && $this->cfg['config']['frontplace'] != 'hide'));

@@ -69,7 +69,7 @@ function PortaMx_AdminSettings()
 							'permissions',
 							serialize($perms)
 						),
-						array()
+						array('varname')
 					);
 				}
 
@@ -117,7 +117,7 @@ function PortaMx_AdminSettings()
 									{db_prefix}settings',
 									array('variable' => 'string', 'value' => 'string'),
 									array($token, $_POST[$token]),
-									array()
+									array('variable')
 								);
 						}
 					}
@@ -162,7 +162,7 @@ function PortaMx_AdminSettings()
 							{db_prefix}settings',
 							array('variable' => 'string', 'value' => 'string'),
 							array($hookname, $smfhooks[$hookname]),
-							array()
+							array('variable')
 						);
 					}
 
@@ -250,7 +250,7 @@ function PortaMx_AdminSettings()
 									$key,
 									$_POST[$key]
 								),
-								array()
+								array('variable')
 							);
 					}
 
@@ -265,7 +265,7 @@ function PortaMx_AdminSettings()
 							'pmx_frontmode',
 							($config['frontpage'] == 'none' ? '0' : '1'),
 						),
-						array()
+						array('variable')
 					);
 
 					if(isset($_POST['pmx_ecl']) && empty($_POST['pmx_ecl']) && isset($_SESSION['pmxcookie']))
