@@ -340,7 +340,7 @@ foreach($tabledate as $tblname => $tbldef)
 							$key,
 							$value,
 						),
-						array()
+						array('varname')
 					);
 				}
 				_dbinst_write($dbstr);
@@ -397,7 +397,7 @@ foreach($tabledate as $tblname => $tbldef)
 							$value['config'],
 							$value['content'],
 						),
-						array()
+						array('id')
 					);
 
 				elseif($tblname == 'portamx_articles')
@@ -435,7 +435,7 @@ foreach($tabledate as $tblname => $tbldef)
 							$value['updated'],
 							$value['updatedby']
 						),
-						array()
+						array('id')
 					);
 			}
 			unset($updated[$tblname]);
@@ -459,7 +459,7 @@ foreach($tabledate as $tblname => $tbldef)
 							$key,
 							$value,
 						),
-						array()
+						array('varname')
 					);
 				}
 				_dbinst_write('.. Table successful initiated.<br />');
@@ -484,7 +484,7 @@ foreach($tabledate as $tblname => $tbldef)
 							'content' => 'string',
 						),
 						$value,
-						array()
+						array('id')
 					);
 				}
 				_dbinst_write('.. Table successful initiated.<br />');
@@ -594,7 +594,7 @@ foreach($hooklist as $hookname => $value)
 		{db_prefix}settings',
 		array('variable' => 'string', 'value' => 'string'),
 		array($hookname, $smfhooks[$hookname]),
-		array()
+		array('variable')
 	);
 }
 
@@ -632,7 +632,7 @@ foreach($sefsettings as $sefname => $value)
 		{db_prefix}settings',
 		array('variable' => 'string', 'value' => 'string'),
 		array($sefname, $value),
-		array()
+		array('variable')
 	);
 }
 
@@ -642,7 +642,7 @@ if(!isset($modSettings['pmx_frontmode']))
 		{db_prefix}settings',
 		array('variable' => 'string', 'value' => 'string'),
 		array('pmx_frontmode', '1'),
-		array()
+		array('variable')
 	);
 
 // clear the cache

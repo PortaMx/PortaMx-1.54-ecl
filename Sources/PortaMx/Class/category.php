@@ -273,12 +273,15 @@ class pmxc_category extends PortaMxC_SystemBlock
 		{
 			// get articles for any cat
 			$request = $smcFunc['db_query']('', '
-				SELECT a.id, a.name, a.acsgrp, a.catid, a.ctype, a.config, a.owner, a.active, a.created, a.updated, a.approved, a.content, m.member_name
+				SELECT a.id, a.name, a.acsgrp, a.catid, a.ctype, a.config, a.owner, a.active, a.created, a.updated, a.approved, a.content, CASE WHEN m.real_name = {string:empty} THEN m.member_name ELSE m.real_name END AS mem_name
 				FROM {db_prefix}portamx_articles AS a
 				LEFT JOIN {db_prefix}members AS m ON (a.owner = m.id_member)
 				WHERE a.catid IN ({array_int:cats}) AND a.active > 0 AND a.approved > 0
 				ORDER BY a.id',
-				array('cats' => $catIDs)
+				array(
+					'cats' => $catIDs,
+					'empty' => '',
+				)
 			);
 
 			if($smcFunc['db_num_rows']($request) > 0)
@@ -290,6 +293,7 @@ class pmxc_category extends PortaMxC_SystemBlock
 					{
 						$row['side'] = $this->cfg['side'];
 						$row['blocktype'] = !empty($this->cfg['config']['static_block']) ? 'static_article' : 'article';
+						$row['member_name'] = $row['mem_name'];
 						$this->articles[$catNames[$row['catid']]][] = $row;
 					}
 				}

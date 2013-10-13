@@ -86,10 +86,10 @@ class pmxc_cbt_navigator extends PortaMxC_SystemBlock
 			$request = $smcFunc['db_query']('', '
 					SELECT c.name AS catname, c.id_cat,
 						b.name AS boardname, b.id_board, b.child_level, b.redirect,
-						IFNULL(t.id_topic, 0) AS id_topic, IFNULL(t.id_last_msg, 0) AS id_last_msg,
+						COALESCE(t.id_topic, 0) AS id_topic, COALESCE(t.id_last_msg, 0) AS id_last_msg,
 						m.id_msg, m.subject, m.poster_name, m.poster_time, '. ($user_info['is_guest'] ? '1 AS isRead, 0 AS new_from' : '
-						IFNULL(lt.id_msg, IFNULL(lmr.id_msg, 0)) >= m.id_msg_modified AS isRead,
-						IFNULL(lt.id_msg, IFNULL(lmr.id_msg, -1)) + 1 AS new_from') .'
+						COALESCE(lt.id_msg, COALESCE(lmr.id_msg, 0)) >= m.id_msg_modified AS isRead,
+						COALESCE(lt.id_msg, COALESCE(lmr.id_msg, -1)) + 1 AS new_from') .'
 					FROM {db_prefix}boards AS b
 					LEFT JOIN {db_prefix}topics AS t ON (t.id_board = b.id_board)
 					LEFT JOIN {db_prefix}categories AS c ON (b.id_cat = c.id_cat)

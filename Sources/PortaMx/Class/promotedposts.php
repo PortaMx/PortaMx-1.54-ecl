@@ -140,7 +140,7 @@ class pmxc_promotedposts extends PortaMxC_SystemBlock
 		{
 			$request = $smcFunc['db_query']('', '
 				SELECT m.poster_time, m.subject, m.id_topic, m.id_member, m.id_msg, m.id_board, m.body, m.smileys_enabled, m.icon,
-					b.name AS board_name, IFNULL(mem.real_name, m.poster_name) AS poster_name, t.num_views, t.num_replies
+					b.name AS board_name, CASE WHEN mem.real_name = {string:empty} THEN m.poster_name ELSE mem.real_name END AS poster_name, t.num_views, t.num_replies
 				FROM {db_prefix}messages AS m
 				LEFT JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
 				LEFT JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic AND t.id_board = b.id_board)
@@ -149,6 +149,7 @@ class pmxc_promotedposts extends PortaMxC_SystemBlock
 				ORDER BY m.id_msg DESC',
 				array(
 					'messages' => $posts,
+					'empty' => '',
 				)
 			);
 

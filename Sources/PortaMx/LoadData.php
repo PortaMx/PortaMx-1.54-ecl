@@ -1383,7 +1383,7 @@ function PortaMx_getArticles($cats, $intcats = false)
 
 	$result = array();
 	$request = $smcFunc['db_query']('', '
-			SELECT c.id AS catid, c.name AS catname, c.acsgrp AS catacs, c.artsort, c.config as catcfg, IF(m.real_name <> "", m.real_name, m.member_name) AS owner_name,
+			SELECT c.id AS catid, c.name AS catname, c.acsgrp AS catacs, c.artsort, c.config as catcfg, CASE WHEN m.real_name = {string:empty} THEN m.member_name ELSE m.real_name END AS owner_name,
 				a.id AS artid, a.name AS artname, a.acsgrp AS artacs, a.owner, a.config AS artcfg, a.active, a.created, a.approved, a.updated
 			FROM {db_prefix}portamx_categories AS c
 			LEFT JOIN {db_prefix}portamx_articles AS a ON (c.id = a.catid)
@@ -1391,7 +1391,8 @@ function PortaMx_getArticles($cats, $intcats = false)
 			WHERE '. (empty($intcats) ? 'c.name IN ({array_string:cats})' : 'c.id IN ({array_int:cats})') .' AND a.active > 0 AND a.approved  > 0
 			ORDER BY c.catorder',
 		array(
-			'cats' => empty($intcats) ? Pmx_StrToArray($cats) : Pmx_StrToIntArray($cats)
+			'cats' => empty($intcats) ? Pmx_StrToArray($cats) : Pmx_StrToIntArray($cats),
+			'empty' => '',
 		)
 	);
 	while($row = $smcFunc['db_fetch_assoc']($request))

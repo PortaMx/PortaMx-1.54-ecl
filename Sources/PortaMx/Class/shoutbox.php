@@ -243,13 +243,14 @@ class pmxc_shoutbox extends PortaMxC_SystemBlock
 
 			// get member name and online color
 			$request = $smcFunc['db_query']('', '
-				SELECT mem.id_member, IF(mem.real_name <> "", mem.real_name, mem.member_name) AS name, mg.online_color AS color
+				SELECT mem.id_member, CASE WHEN mem.real_name = {string:empty} THEN mem.member_name ELSE mem.real_name END AS name, mg.online_color AS color
 				FROM {db_prefix}members AS mem
-				LEFT JOIN {db_prefix}membergroups AS mg ON ('. (!empty($modSettings['permission_enable_postgroups']) ? '(mg.id_group = 0 AND mg.id_group = mem.id_post_group OR mg.id_group > 0 AND mg.id_group = mem.id_group)' : 'mg.id_group = mem.id_group') .'  OR FIND_IN_SET(mg.id_group, mem.additional_groups))
+				LEFT JOIN {db_prefix}membergroups AS mg ON ('. (!empty($modSettings['permission_enable_postgroups']) ? '(mg.id_group = 0 AND mg.id_group = mem.id_post_group OR mg.id_group > 0 AND mg.id_group = mem.id_group)' : 'mg.id_group = mem.id_group') .' OR FIND_IN_SET(mg.id_group, mem.additional_groups) != 0)
 				WHERE mem.id_member IN ({array_int:members})
-				GROUP BY mem.id_member',
+				GROUP BY mem.id_member, mg.online_color',
 				array(
-					'members' => array_unique($members)
+					'members' => array_unique($members),
+					'empty' => '',
 				)
 			);
 

@@ -41,14 +41,11 @@ class pmxc_download extends PortaMxC_SystemBlock
 			{
 				// get downloads for board
 				$request = $smcFunc['db_query']('', '
-						SELECT a.id_attach, a.size, a.downloads, t.id_topic, t.locked, m.subject, m.body,
-						IF(m.subject REGEXP \'^[0-9 ]{4}\', CAST(LEFT(m.subject, 4) AS UNSIGNED), 0) AS file_order
+						SELECT a.id_attach, a.size, a.downloads, t.id_topic, t.locked, m.subject, m.body
 						FROM {db_prefix}attachments a
 						LEFT JOIN {db_prefix}messages m ON (a.id_msg = m.id_msg)
 						LEFT JOIN {db_prefix}topics t ON (m.id_topic = t.id_topic)
-						WHERE m.id_board = {int:board}
-						AND a.mime_type NOT LIKE {string:likestr} AND t.locked = 0
-						ORDER BY file_order ASC',
+						WHERE m.id_board = {int:board} AND a.mime_type NOT LIKE {string:likestr} AND t.locked = 0',
 					array(
 						'board' => $this->cfg['config']['settings']['download_board'],
 						'likestr' => 'IMAGE%'
@@ -72,11 +69,11 @@ class pmxc_download extends PortaMxC_SystemBlock
 						if($user_info['is_admin'])
 							$this->download_content .= '
 							<a href="'. $scripturl .'?topic='. $row['id_topic'] .'">
-								<strong>'. (empty($row['file_order']) ? $row['subject'] : substr($row['subject'], 4)) .'</strong>
+								<strong>'. $row['subject'] .'</strong>
 							</a>';
 						else
 							$this->download_content .= '
-							<strong>'. (empty($row['file_order']) ? $row['subject'] : substr($row['subject'], 4)) .'</strong>';
+							<strong>'. $row['subject'] .'</strong>';
 
 						$this->download_content .= '
 							<div class="dlcomment">'. parse_bbc(trim($row['body'])) .'</div>

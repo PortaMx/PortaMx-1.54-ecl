@@ -7,6 +7,9 @@
 * \version 1.51
 * \date 31.08.2012
 */
+#pmx_form {
+	clear: both;
+}
 
 /* common formatting styles */
 .pmx_printimg
