@@ -64,10 +64,10 @@ class PortaMxC_AdminBlocks
 		return $extOpts;
 	}
 
-  /**
-  * Get Config data (name=value format)
+	/**
+	* Get Config data (name=value format)
 	* return result array
-  */
+	*/
 	function getConfigData($itemstr = '')
 	{
 		$item = Pmx_StrToArray($itemstr);
@@ -78,18 +78,18 @@ class PortaMxC_AdminBlocks
 			$ptr = &$ptr[$key];
 
 		if(isset($ptr))
-    {
-      if(is_array($ptr))
-		  {
-			  foreach($ptr as $val)
-			  {
-				  $tmp = Pmx_StrToArray($val, '=');
-				  if(isset($tmp[0]) && isset($tmp[1]))
-					  $result[$tmp[0]] = $tmp[1];
-			  }
-      }
-      else
-        $result = $ptr;
+		{
+			if(is_array($ptr))
+			{
+				foreach($ptr as $val)
+				{
+					$tmp = Pmx_StrToArray($val, '=');
+					if(isset($tmp[0]) && isset($tmp[1]))
+						$result[$tmp[0]] = $tmp[1];
+				}
+			}
+			else
+				$result = $ptr;
 		}
 		return $result;
 	}
@@ -142,7 +142,6 @@ class PortaMxC_SystemAdminBlock extends PortaMxC_AdminBlocks
 									<input type="hidden" name="active" value="'. $this->cfg['active'] .'" />
 									<input type="hidden" name="cache" value="'. $this->cfg['cache'] .'" />
 									<input type="hidden" name="contenttype" value="'. ($this->cfg['blocktype'] == 'download' ? 'bbc_script' : $this->cfg['blocktype']) .'" />
-									<input type="hidden" name="config" value="'. $this->cfg['config'] .'" />
 									<input type="hidden" name="check_num_vars[]" value="[config][maxheight], \'\'" />
 									<div style="height:50px;">
 										<div style="float:'. $LtR .';width:110px; padding-top:1px;">'. $txt['pmx_edit_title'] .'</div>';
