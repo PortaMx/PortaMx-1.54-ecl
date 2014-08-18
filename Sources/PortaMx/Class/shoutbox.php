@@ -4,9 +4,9 @@
 * Systemblock shoutbox
 *
 * \author PortaMx - Portal Management Extension
-* \author Copyright 2008-2012 by PortaMx - http://portamx.com
-* \version 1.51
-* \date 22.08.2012
+* \author Copyright 2008-2014 by PortaMx corp. - http://portamx.com
+* \version 1.52
+* \date 18.08.2014
 */
 
 if(!defined('PortaMx'))
@@ -1043,14 +1043,16 @@ class pmxc_shoutbox extends PortaMxC_SystemBlock
 	*/
 	function convertSmileys($value)
 	{
+		global $smReplace, $smImage;
+
 		foreach($this->smileys as $data)
 		{
 			$code = $this->ChartoHTML($data['code']);
 			$smImage[$code] = '<img src="'. $data['image'] .'" title="'. $data['title'] .'" alt="*" />';
-			$smReplace[$code] = preg_quote($code, '~');
+			$smReplace[$code] = preg_quote($code, '>');
 		}
-		$smPregSearch = '~('. implode('|', $smReplace) . ')(\s|$)+~e';
-		return preg_replace($smPregSearch, 'isset($smReplace[\'$1\']) ? $smImage[\'$1\'] . \'$2\' : \'\'', $value);
+		$smPregSearch = '/('. implode('|', $smReplace) . ')(\s|$)+/';
+		return preg_replace_callback($smPregSearch, create_function('$matches', 'global $smReplace, $smImage; return isset($smReplace[$matches[1]]) ? $smImage[$matches[1]] . $matches[2] : "";'), $value);
 	}
 }
 ?>

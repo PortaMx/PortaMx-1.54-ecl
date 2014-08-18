@@ -4,9 +4,9 @@
 * Subroutines for Portamx.
 *
 * \author PortaMx - Portal Management Extension
-* \author Copyright 2008-2012 by PortaMx - http://portamx.com
-* \version 1.51
-* \date 31.08.2012
+* \author Copyright 2008-2014 by PortaMx corp. - http://portamx.com
+* \version 1.52
+* \date 18.08.2014
 */
 
 if(!defined('SMF'))
@@ -872,7 +872,7 @@ function PortaMx_getSettings($from_eclinit = false)
 	$context['pmx']['ca_keys'] = array('action' => ':', 'art' => 'a:', 'cat' => 'c:', 'child' => 'c:', 'spage' => 'p:');
 
 	$pmx_ajax_functions = array(
-		'php_check' => 'PortaMx_PHPsyntax',
+		'pmx_php_check' => 'PortaMx_PHPsyntax',
 	);
 
 	// load common language
@@ -2006,7 +2006,7 @@ function PortaMx_getSmileySet()
 **/
 function PortaMx_BBCsmileys($content)
 {
-	global $modSettings, $context, $pmxCacheFunc;
+	global $modSettings, $context, $pmxCacheFunc, $smileyPregReplace;
 
 	if(!empty($content))
 	{
@@ -2023,39 +2023,35 @@ function PortaMx_BBCsmileys($content)
 		);
 		$content = preg_replace(array_keys($html), array_values($html), $content);
 
-		// if cached ?
+		// smileys cached ?
 		if(($data = $pmxCacheFunc['get']('smileys', false)) !== null)
 		{
 			$smileyPregSearch = $data['search'];
-			$smileyPregReplacements = $data['replace'];
+			$smileyPregReplace = $data['replace'];
 		}
 		else
 		{
-			$smset = PortaMx_getSmileySet();
-			$smileyfrom = $smset['symbols'];
-			$smileyto = $smset['files'];
-			$non_breaking_space = $context['utf8'] ? ($context['server']['complex_preg_chars'] ? '\x{A0}' : "\xC2\xA0") : '\xA0';
+			$smileyfrom = array(':))', ':)', ';)', ':D', ';D', '>:(', ':(', ':o', '8)', '???', '::)', ':P', ':-[', ':-X', ':-\\', ':-*', ':\'(', '>:D','^-^', 'O0');
+			$smileyto = array('laugh.gif', 'smiley.gif', 'wink.gif', 'cheesy.gif', 'grin.gif', 'angry.gif', 'sad.gif', 'shocked.gif', 'cool.gif', 'huh.gif', 'rolleyes.gif', 'tongue.gif', 'embarrassed.gif', 'lipsrsealed.gif', 'undecided.gif', 'kiss.gif', 'cry.gif', 'evil.gif', 'azn.gif', 'afro.gif');
 
-			$smileyPregReplacements = array();
+			$smileyPregReplace = array();
 			$searchParts = array();
 			for ($i = 0, $n = count($smileyfrom); $i < $n; $i++)
 			{
-				$smileyCode = '<img src="' . htmlspecialchars($modSettings['smileys_url'] . '/PortaMx/' . $smileyto[$i]) . '" alt="*" title="" class="smiley" />';
-				$smileyPregReplacements[$smileyfrom[$i]] = $smileyCode;
-				$smileyPregReplacements[htmlspecialchars($smileyfrom[$i], ENT_QUOTES)] = $smileyCode;
-				$searchParts[] = preg_quote($smileyfrom[$i], '~');
-				$searchParts[] = preg_quote(htmlspecialchars($smileyfrom[$i], ENT_QUOTES), '~');
+				$smileyCode = '<img src="' . $modSettings['smileys_url'] . '/PortaMx/' . $smileyto[$i] . '" alt="*" title="" class="smiley" />';
+				$smileyPregReplace[$smileyfrom[$i]] = $smileyCode;
+				$searchParts[] = preg_quote($smileyfrom[$i], '>');
 			}
-			$smileyPregSearch = '~(?<=[>:\?\.\s' . $non_breaking_space . '[\]()*\\\;]|^)(' . implode('|', $searchParts) . ')(?=[^[:alpha:]0-9]|$)~e' . ($context['utf8'] ? 'u' : '');
+			$smileyPregSearch = '/(' . implode('|', $searchParts) . ')(\s|\<|$)+/';
 
 			// put to cache
 			$data['search'] = $smileyPregSearch;
-			$data['replace'] = $smileyPregReplacements;
+			$data['replace'] = $smileyPregReplace;
 			$pmxCacheFunc['put']('smileys', $data, 86400, false);
 		}
 
 		// convert smileys
-		return preg_replace($smileyPregSearch, 'isset($smileyPregReplacements[\'$1\']) ? $smileyPregReplacements[\'$1\'] : \'\'', $content);
+		return preg_replace_callback($smileyPregSearch, create_function('$matches', 'global $smileyPregReplace; return isset($smileyPregReplace[$matches[1]]) ? $smileyPregReplace[$matches[1]] . (isset($matches[2]) ? $matches[2] : "") : "";'), $content);
 	}
 	else
 		return $content;
@@ -2139,15 +2135,14 @@ function PortaMx_revoveLinks($content, $unlinkhref = false, $unlinkimg = false)
 }
 
 /**
-* Post teaser (shorten posts by given wordcount).
-* remove_atags = true: remove Links from content.
-* remove_atags = false: not remove Links from content.
-* remove_images = false: images not unlink.
-* remove_images = true: unlink images.
+* Post teaser (shorten posts by given word/character count).
+* $remtags = true: remove Links from content.
+* $remimgs = true: remove images.
+* $morelink: if give, it's added at the end of the content
 */
 function PortaMx_Tease_posts($content, $wordcount, $morelink = '', $remtags = false, $remimgs = false)
 {
-	global $context, $settings, $user_info, $txt, $smcFunc;
+	global $context, $txt, $smcFunc, $pmx_transchr;
 
 	// remove images/links
 	if($remtags || $remimgs)
@@ -2156,8 +2151,9 @@ function PortaMx_Tease_posts($content, $wordcount, $morelink = '', $remtags = fa
 	// setup Post teaser mode
 	$PmxTeaseCount = (empty($context['pmx']['settings']['teasermode']) ? 'pmx_teasecountwords' : 'pmx_teasecountchars');
 	$PmxTeaseShorten = (empty($context['pmx']['settings']['teasermode']) ? 'pmx_teasegetwords' : 'pmx_teasegetchars');
+	$pmx_transchr = array_flip(get_html_translation_table(HTML_SPECIALCHARS, ENT_QUOTES)) + array('&#039;' => '\'', '&nbsp;' => ' ', '&#160;' => ' ');
 	$teaseMode = intval(!empty($context['pmx']['settings']['teasermode']));
-	$content = str_replace(array("\n", "\t", "\r"), '', $content);
+	$content = str_replace(array("\n", "\r"), '', $content);
 	$contentlen = $PmxTeaseCount($content);
 	$teased = false;
 	$wordcount = ($wordcount == -1 ? pmx_teasecountchars($content) : $wordcount);
@@ -2167,6 +2163,10 @@ function PortaMx_Tease_posts($content, $wordcount, $morelink = '', $remtags = fa
 	{
 		$pgbrk = $smcFunc['strpos']($content, $match[0]);
 		$content = pmx_teasegetchars($smcFunc['substr']($content, 0, $pgbrk), $pgbrk);
+		$tags = pmx_tease_gettags($content);
+		$words = preg_split('/ /', $content);
+		$words[count($words)-1] = preg_replace('/<(br|p|div|span|ol|ul|li|table|tr|td)[^>]*>/', '', $words[count($words)-1]);
+		$content = pmx_tease_settags(implode(' ', $words), $tags);
 		$context['pmx']['is_teased'] = $PmxTeaseCount($content);
 		$teased = true;
 	}
@@ -2204,9 +2204,10 @@ function PortaMx_Tease_posts($content, $wordcount, $morelink = '', $remtags = fa
 */
 function pmx_teasecountwords($text)
 {
-	$pmx_transchr = array_flip(get_html_translation_table(HTML_SPECIALCHARS, ENT_QUOTES)) + array('&#039;' => '\'', '&nbsp;' => ' ');
-//	$text = preg_replace(array('/(\S)(<br[^>]*>)(\S)/e', '/([a-zA-Z0-9])(\/)(\S)/e'), array("'\\1\\2 \\3'", "'\\1 \\2\\3'"), $text);
-	return count(preg_split('/\s+/', preg_replace('/<[^>]*>/', '', strtr($text, $pmx_transchr))));
+	global $pmx_transchr;
+	$text = preg_replace_callback('/(\S)(<br[^>]*>)(\S)/', create_function('$matches', 'return $matches[1] . $matches[2] ." ". $matches[3];'), $text);
+	$text = preg_replace_callback('/([a-zA-Z0-9])(\/)(\S)/', create_function('$matches', 'return $matches[1] ." ". $matches[2] . $matches[3];'), $text);
+	return count(preg_split('/ /', preg_replace('/<[^>]*>/', '', $text)));
 }
 
 /**
@@ -2214,9 +2215,8 @@ function pmx_teasecountwords($text)
 */
 function pmx_teasecountchars($text)
 {
-	global $smcFunc;
+	global $smcFunc, $pmx_transchr;
 
-	$pmx_transchr = array_flip(get_html_translation_table(HTML_SPECIALCHARS, ENT_QUOTES)) + array('&#039;' => '\'', '&nbsp;' => ' ');
 	return $smcFunc['strlen'](strtr(preg_replace('/<[^>]*>/', '', $text), $pmx_transchr));
 }
 
@@ -2225,13 +2225,11 @@ function pmx_teasecountchars($text)
 */
 function pmx_teasegetwords($text, $wordcount)
 {
-	global $context;
-
-	$pmx_transchr = array_flip(get_html_translation_table(HTML_SPECIALCHARS, ENT_QUOTES)) + array('&#039;' => '\'', '&nbsp;' => ' ');
-	$text = preg_replace('/(\S)(<br[^>]*>)(\S)/e', "'\\1\\2 \\3'", $text);
+	global $pmx_transchr;
+	$text = preg_replace_callback('/(\S)(<br[^>]*>)(\S)/', create_function('$matches', 'return $matches[1] . $matches[2] ." ". $matches[3];'), $text);
 	$tags = pmx_tease_gettags($text);
-	$text = preg_replace('/([a-zA-Z0-9])(\/)(\S)/e', "'\\1 \\2\\3'", $text);
-	$words = preg_split('/ /', $text);
+	$text = preg_replace_callback('/([a-zA-Z0-9])(\/)(\S)/', create_function('$matches', 'return $matches[1] ." ". $matches[2] . $matches[3];'), $text);
+	$words = preg_split('/ /', preg_replace('/<[^>]*>/', '', $text));
 	$addwords = 0;
 	foreach($words as $i => $word)
 	{
@@ -2250,7 +2248,7 @@ function pmx_teasegetwords($text, $wordcount)
 	unset($words);
 
 	$text = pmx_tease_settags(rtrim($text), $tags);
-	$text = preg_replace('/(\S)(<br[^>]*>)(" ")/e', "'\\1\\2'", $text);
+	$text = preg_replace_callback('/(\S)(<br[^>]*>)(" ")/', create_function('$matches', 'return $matches[1] . $matches[2];'), $text);
 
 	return $text;
 }
@@ -2260,12 +2258,11 @@ function pmx_teasegetwords($text, $wordcount)
 */
 function pmx_teasegetchars($text, $wordcount)
 {
-	global $context, $smcFunc;
+	global $smcFunc, $pmx_transchr;
 
 	$tags = pmx_tease_gettags($text);
 	if(!empty($tags))
 	{
-		$pmx_transchr = array_flip(get_html_translation_table(HTML_SPECIALCHARS, ENT_QUOTES)) + array('&#039;' => '\'', '&nbsp;' => ' ');
 		if(preg_match_all('/<[0-9]+>/', utf8_decode(strtr($text, $pmx_transchr)), $repl, PREG_OFFSET_CAPTURE) > 0)
 		{
 			foreach($repl[0] as $nt)
@@ -2294,8 +2291,6 @@ function pmx_tease_gettags(&$text)
 */
 function pmx_tease_settags($text, $tags)
 {
-	global $smcFunc;
-
 	$text = rtrim($text);
 	foreach($tags as $i => $tag)
 	{
@@ -2388,42 +2383,132 @@ function PortaMx_PHPsyntax($data)
 	global $context, $boarddir;
 
 	// get php version
-	exec('php -v', $vers, $state);
+	@exec('php -v', $vers, $state);
 	if($state != 0)
-	{
 		$context['xmlpmx'] = '<b>Error: '. $state .' - PHP CLI not found.</b>';
-		$context['xmlpmx'] .= '<img onclick="this.parentNode.className=\'info_frame\'" style="padding-left:10px;cursor:pointer;" alt="close" src="'. $context['pmx_imageurl'] .'cross.png" class="pmxright" /><hr /><b>';
+
+	// init return result
+	do {
+		list($d, $line) = each($vers);
+	} while(empty($line));
+
+	$context['xmlpmx'] = $line;
+	$context['xmlpmx'] .= '<img onclick="Hide_SyntaxCheck(this.parentNode)" style="padding-left:10px;cursor:pointer;" alt="close" src="'. $context['pmx_imageurl'] .'cross.png" class="pmxright" /><hr class="pmx_hr" />';
+
+	// call the syntaxCheck
+	$result = php_syntax_error($data);
+
+	// setup result
+	if(empty($result))
+		$line = '<b>No syntax errors detected.</b>';
+	else
+	{
+		$errline = empty($result[1]) ? '1' : $result[1];
+		$line = '<b>'. $result[0] .' on line: '. $errline .'</b>';
+		$line .= '&nbsp;&nbsp;<img style="vertical-align:-2px;width:14px;height:14px;cursor:pointer;" onclick="php_showerrline(\'@elm@\', '. $errline .')" src="'. $context['pmx_imageurl'] .'opt_nofilter.png" alt="*" title="'. $errline .'" />';
+	}
+	$context['xmlpmx'] .= $line .'<br />';
+
+	// remove the cookie
+	pmx_setcookie('pmx_php_check', '');
+}
+
+/**
+* php syntax check
+*/
+function php_syntax_error($code)
+{
+	$braces = 0;
+	$inString = 0;
+
+	// First of all, we need to know if braces are correctly balanced.
+	// This is not trivial due to variable interpolation which
+	// occurs in heredoc, backticked and double quoted strings
+	foreach(token_get_all('<?php ' . $code) as $token)
+	{
+		if(is_array($token))
+		{
+			switch ($token[0])
+			{
+				case T_CURLY_OPEN:
+				case T_DOLLAR_OPEN_CURLY_BRACES:
+				case T_START_HEREDOC: ++$inString; break;
+				case T_END_HEREDOC:   --$inString; break;
+			}
+		}
+		else if($inString & 1)
+		{
+			switch($token)
+			{
+				case '`':
+				case '"': --$inString; break;
+			}
+		}
+		else
+		{
+			switch($token)
+			{
+			case '`':
+			case '"': ++$inString; break;
+			case '{': ++$braces; break;
+			case '}':
+				if($inString) --$inString;
+				else
+				{
+					--$braces;
+					if($braces < 0) break 2;
+				}
+				break;
+			}
+		}
+	}
+
+	// Display parse error messages and use output buffering to catch them
+	$inString = @ini_set('log_errors', false);
+	$token = @ini_set('display_errors', true);
+	ob_start();
+
+	// If $braces is not zero, then we are sure that $code is broken.
+	// We run it anyway in order to catch the error message and line number.
+	// Else, if $braces are correctly balanced, then we can safely put
+	// $code in a dead code sandbox to prevent its execution.
+	// Note that without this sandbox, a function or class declaration inside
+	// $code could throw a "Cannot redeclare" fatal error.
+	$braces || $code = "if(0){{$code}\n}";
+
+	if(false === eval($code))
+	{
+		if($braces) $braces = PHP_INT_MAX;
+			else
+		{
+			// Get the maximum number of lines in $code to fix a border case
+			false !== strpos($code, "\r") && $code = strtr(str_replace("\r\n", "\n", $code), "\r", "\n");
+			$braces = substr_count($code, "\n");
+		}
+
+		$code = ob_get_clean();
+		$code = strip_tags($code);
+
+		// Get the error message and line number
+		if(preg_match("'syntax error, (.+) in .+ on line (\d+)$'s", $code, $code))
+		{
+			$code[2] = (int) $code[2];
+			$code = $code[2] <= $braces
+				? array($code[1], $code[2])
+				: array('unexpected $end' . substr($code[1], 14), $braces);
+		}
+		else
+			$code = array('syntax error', 0);
 	}
 	else
 	{
-		// init return result
-		do {
-			list($d, $line) = each($vers);
-		} while(empty($line));
-
-		$context['xmlpmx'] = $line;
-		$context['xmlpmx'] .= '<img onclick="this.parentNode.className=\'info_frame\'" style="padding-left:10px;cursor:pointer;" alt="close" src="'. $context['pmx_imageurl'] .'cross.png" class="pmxright" /><hr /><b>';
-
-		// make a php "lint"
-		$fname = $boarddir .'/php_syntax_check';
-		pmx_file_put_contents($fname, '<?php '. str_replace(array('<?php', '<?', '?>'), '', $data) .' ?>');
-		exec('php -l '. $fname, $result);
-		@unlink($fname);
-
-		// setup result
-		foreach($result as $line)
-		{
-			if(!empty($line))
-			{
-				$line = str_replace($fname, 'content', $line);
-				if(preg_match('/on\sline\s(\d+)/', $line, $errline) > 0)
-					$line .= '&nbsp;&nbsp;<img style="vertical-align:-2px;width:14px;height:14px;cursor:pointer;" onclick="php_showerrline(\'@elm@\', '. $errline[1] .')" src="'. $context['pmx_imageurl'] .'opt_nofilter.png" alt="*" title="'. $errline[1] .'" />';
-
-				$context['xmlpmx'] .= $line .'<br />';
-			}
-		}
-		$context['xmlpmx'] .= '</b>';
+		ob_end_clean();
+		$code = false;
 	}
+
+	@ini_set('display_errors', $token);
+	@ini_set('log_errors', $inString);
+	return $code;
 }
 
 /**

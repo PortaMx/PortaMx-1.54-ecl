@@ -1,3 +1,8 @@
+PortaMx v1.52 - 18 August 2014
+------------------------------
+# Upgrade to work with php 5.5 and greater
+# added new php syntax check
+
 PortaMx v1.51 - 18 Sep 2012
 ---------------------------
 # Pageindex not show if only one page (PortaMx_BlocksClass.php)

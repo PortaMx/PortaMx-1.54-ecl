@@ -32,9 +32,9 @@
 * @author FCKeditor - The text editor for Internet - http://www.fckeditor.net
 * @author Copyright (C) 2003-2008 Frederico Caldeira Knabben
 * \author PortaMx - Portal Management Extension
-* \author Copyright 2008-2012 by PortaMx - http://portamx.com
-* \version 1.51
-* \date 31.08.2012
+* \author Copyright 2008-2014 by PortaMx corp. - http://portamx.com
+* \version 1.52
+* \date 18.08.2014
 */
 
 if ( !function_exists('version_compare') || version_compare( phpversion(), '5', '<' ) )

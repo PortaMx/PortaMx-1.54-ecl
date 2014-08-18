@@ -5,9 +5,9 @@
 * Checks the values and saved the parameter to the database.
 *
 * \author PortaMx - Portal Management Extension
-* \author Copyright 2008-2012 by PortaMx - http://portamx.com
-* \version 1.51
-* \date 31.08.2012
+* \author Copyright 2008-2014 by PortaMx corp. - http://portamx.com
+* \version 1.52
+* \date 18.08.2014
 */
 
 if(!defined('PortaMx'))
@@ -379,36 +379,28 @@ function PortaMx_AdminArticles()
 						}
 					}
 
-					// convert between html/script and bbc
-					if(!empty($_POST['html_to_bbc']) && ($_POST['contenttype'] == 'bbc' && $_POST['ctype'] == 'bbc') || ($_POST['ctype'] == 'bbc' && in_array($_POST['contenttype'], array('html', 'code'))))
+					if(isset($_POST['content']) && PortaMx_makeSafeContent($_POST['content']) != '')
 					{
-						require_once($sourcedir . '/Subs-Editor.php');
-						$user_info['smiley_set'] = 'PortaMx';
-						$_POST['content'] = PortaMx_HTMLtoBBC(PortaMx_makeSafeContent($_POST['content']), $_POST['contenttype']);
-						$_POST['content'] = html_to_bbc($_POST['content']);
-						$_POST['content'] = PortaMx_convertSmileys($_POST['content']);
-					}
-					elseif(empty($_POST['html_to_bbc']) && $_POST['contenttype'] == 'bbc' && in_array($_POST['ctype'], array('html', 'code')))
-					{
-						require_once($sourcedir . '/Subs-Editor.php');
-						$_POST['content'] = parse_bbc(PortaMx_makeSafeContent($_POST['content'], $_POST['contenttype']), false);
-						$_POST['content'] = PortaMx_BBCsmileys($_POST['content']);
-						$_POST['content'] = PortaMx_BBCtoHTML($_POST['content']);
-					}
-					elseif(!empty($_POST['html_to_bbc']) && ($_POST['contenttype'] == 'bbc' && in_array($_POST['ctype'], array('html', 'code'))))
-					{
-						$_POST['content'] = parse_bbc(PortaMx_makeSafeContent($_POST['content'], $_POST['contenttype']), false);
-						$_POST['content'] = PortaMx_BBCsmileys($_POST['content']);
-						$_POST['content'] = PortaMx_BBCtoHTML($_POST['content']);
-					}
-					elseif($_POST['contenttype'] == 'html' && $_POST['ctype'] == 'code')
-						$_POST['content'] = PortaMx_BBCtoHTML(PortaMx_makeSafeContent($_POST['content'], $_POST['contenttype']));
+						// convert html/script to bbc
+						if($_POST['ctype'] == 'bbc' && in_array($_POST['contenttype'], array('html', 'code')))
+						{
+							require_once($sourcedir . '/Subs-Editor.php');
+							$user_info['smiley_set'] = 'PortaMx';
+							$_POST['content'] = html_to_bbc($_POST['content']);
+							$_POST['content'] = preg_replace_callback('/(\n)(\s)/', create_function('$matches', 'return $matches[1];'), $_POST['content']);
+						}
 
-					// handling special php blocks
-					elseif($_POST['ctype'] == 'php' && $_POST['contenttype'] == 'php')
-						pmxPHP_convert();
-					elseif($_POST['ctype'] == 'php' || $_POST['contenttype'] == 'php' && in_array($_POST['ctype'], array('html', 'code')))
-						pmxPHP_convert();
+						// convert bbc to html/script
+						elseif($_POST['contenttype'] == 'bbc' && in_array($_POST['ctype'], array('html', 'code')))
+						{
+							require_once($sourcedir . '/Subs-Editor.php');
+							$_POST['content'] = PortaMx_BBCsmileys(parse_bbc(PortaMx_makeSafeContent($_POST['content'], $_POST['contenttype']), false));
+						}
+
+						// handling special php blocks
+						elseif($_POST['ctype'] == 'php' && $_POST['contenttype'] == 'php')
+							pmxPHP_convert();
+					}
 
 					// remove relative pathes/urls in content
 					$_POST['content'] = str_replace('/fckeditor/editor/../..', '', $_POST['content']);

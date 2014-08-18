@@ -2,10 +2,10 @@
 <!DOCTYPE package-info SYSTEM "http://www.simplemachines.org/xml/package-info">
 <package-info xmlns="http://www.simplemachines.org/xml/package-info" xmlns:smf="http://www.simplemachines.org/">
 
-	<name>PortaMx 1.51 ecl</name>
+	<name>PortaMx 1.52 ecl</name>
 	<id>portamx_corp:PortaMx</id>
 	<type>modification</type>
-	<version>1.51</version>
+	<version>1.52</version>
 
 	<install for="2.0*">
 		<readme type="file" parsebbc="true">install/readme.bbc</readme>
@@ -29,6 +29,15 @@
 		<require-file name="admin_images/pmx_adm_settings.gif" destination="$imagesdir/admin" />
 		<redirect url="$scripturl?action=admin;area=pmx_center" timeout="60000">install/installdone.html</redirect>
 	</install>
+
+	<upgrade from="1.51" for="2.0*">
+		<readme type="file" parsebbc="true">install/readme.bbc</readme>
+		<database type="file">install/dbinstall.php</database>
+		<require-dir name="Sources/PortaMx" destination="$sourcedir" />
+		<require-dir name="Themes/default/PortaMx" destination="$themedir" />
+		<require-dir name="Themes/default/languages/PortaMx" destination="$languagedir" />
+		<redirect url="$scripturl?action=admin;area=pmx_center" timeout="60000">install/installdone.html</redirect>
+	</upgrade>
 
 	<upgrade from="1.5" for="2.0*">
 		<readme type="file" parsebbc="true">install/readme.bbc</readme>

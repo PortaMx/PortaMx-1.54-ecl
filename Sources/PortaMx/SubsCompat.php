@@ -4,9 +4,9 @@
 * Compatibility & ECL Subroutines for Portamx.
 *
 * \author PortaMx - Portal Management Extension
-* \author Copyright 2008-2012 by PortaMx - http://portamx.com
-* \version 1.51
-* \date 31.08.2012
+* \author Copyright 2008-2014 by PortaMx corp. - http://portamx.com
+* \version 1.52
+* \date 18.08.2014
 */
 
 if(!defined('SMF'))
@@ -272,6 +272,6 @@ function pmx_serialize($data)
 	if(@version_compare(PHP_VERSION, '5.2.1') > 0)
 		return serialize($data);
 	else
-		return preg_replace('/s:(\d+):"([^"]*)";/se', "'s:'. strlen('\\2') .':\"\\2\";'", serialize($data));
+		return preg_replace_callback('/s:(\d+):"([^"]*)";/s', create_function('$matches', 'return "s:". strlen($matches[2]) .":\"". $matches[2] ."\";";'), serialize($data));
 }
 ?>

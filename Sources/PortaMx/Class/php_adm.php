@@ -4,9 +4,9 @@
 * Admin Systemblock php
 *
 * \author PortaMx - Portal Management Extension
-* \author Copyright 2008-2012 by PortaMx - http://portamx.com
-* \version 1.51
-* \date 31.08.2012
+* \author Copyright 2008-2014 by PortaMx corp. - http://portamx.com
+* \version 1.52
+* \date 18.08.2014
 */
 
 if(!defined('PortaMx'))
@@ -116,35 +116,13 @@ class pmxc_php_adm extends PortaMxC_SystemAdminBlock
 							<div id="check_'. $context['pmx']['editorID_init']['id'] .'" class="info_frame" style="line-height:1.4em;margin-bottom:0;"></div>
 							<div>', template_control_richedit($context['pmx']['editorID_init']['id']) ,'</div>
 						</div>
-						<script language="JavaScript" type="text/javascript"><!-- // --><![CDATA[';
-
-		if(empty($context['pmx']['editorID_show']['havecont']))
-			echo '
-						var upshrinkPHPshow = new smc_Toggle({
-							bToggleEnabled: true,
-							bCurrentlyCollapsed: '. (empty($options['collapse_phpinit']) ? 'false' : 'true') .',
-							aSwappableContainers: [
-								\'upshrinkPHPshowCont\',
-								\'upshrinkPHPinitCont\'
-							],
-							aSwapImages: [
-								{
-									sId: \'upshrinkPHPshowImg\',
-									srcCollapsed: \''. $context['pmx_img_colapse'] .'\',
-									altCollapsed: '. JavaScriptEscape($txt['pmx_expand'] . $txt['pmx_php_partblock']) .',
-									srcExpanded: \''. $context['pmx_img_expand'] .'\',
-									altExpanded: '. JavaScriptEscape($txt['pmx_collapse'] . $txt['pmx_php_partblock']) .'
-								}
-							]
-						});';
-
-		echo '
+						<script language="JavaScript" type="text/javascript"><!-- // --><![CDATA[
 						function php_syntax(elmid)
 						{
-							var result = pmx_setCookie("php_check", document.getElementById(elmid).value);
+							document.getElementById("check_" + elmid).className = "info_frame";
+							var result = pmx_setCookie("pmx_php_check", document.getElementById(elmid).value);
 							result = result.replace(/@elm@/g, elmid);
 							document.getElementById("check_" + elmid).innerHTML = result;
-							document.getElementById("check_" + elmid).className = "info_frame";
 							Show_help("check_" + elmid);
 
 							var errLine = /(on\sline\s)(\d+)(.*)/;
@@ -176,7 +154,33 @@ class pmxc_php_adm extends PortaMxC_SystemAdminBlock
 								}
 							}
 						}
-						// ]]></script>';
+						function Hide_SyntaxCheck(elm)
+						{
+							elm.className = "info_frame";
+						}';
+
+		if(empty($context['pmx']['editorID_show']['havecont']))
+			echo '
+						var upshrinkPHPshow = new smc_Toggle({
+							bToggleEnabled: true,
+							bCurrentlyCollapsed: '. (empty($options['collapse_phpinit']) ? 'false' : 'true') .',
+							aSwappableContainers: [
+								\'upshrinkPHPshowCont\',
+								\'upshrinkPHPinitCont\'
+							],
+							aSwapImages: [
+								{
+									sId: \'upshrinkPHPshowImg\',
+									srcCollapsed: \''. $context['pmx_img_colapse'] .'\',
+									altCollapsed: '. JavaScriptEscape($txt['pmx_expand'] . $txt['pmx_php_partblock']) .',
+									srcExpanded: \''. $context['pmx_img_expand'] .'\',
+									altExpanded: '. JavaScriptEscape($txt['pmx_collapse'] . $txt['pmx_php_partblock']) .'
+								}
+							]
+						});';
+
+		echo '
+					// ]]></script>';
 
 		echo '
 					</td>
