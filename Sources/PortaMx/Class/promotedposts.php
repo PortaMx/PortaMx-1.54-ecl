@@ -108,7 +108,7 @@ class pmxc_promotedposts extends PortaMxC_SystemBlock
 		$posts = null;
 
 		// get messages by posts
-		if($this->cfg['config']['settings']['selectby'] == 'posts')
+		if($this->cfg['config']['settings']['selectby'] == 'posts' && isset($this->cfg['config']['settings']['posts']))
 		{
 			// check ALL posts set
 			if(in_array('0', $this->cfg['config']['settings']['posts']))

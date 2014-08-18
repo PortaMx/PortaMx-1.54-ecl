@@ -55,9 +55,6 @@ class pmxc_promotedposts_adm extends PortaMxC_SystemAdminBlock
 			$smcFunc['db_free_result']($request);
 		}
 
-		if(empty($this->cfg['config']['settings']['posts']))
-			$this->cfg['config']['settings']['posts'] = array();
-
 		$this->block_classdef = PortaMx_getdefaultClass(true);	// extended classdef
 		$this->can_cached = 1;		// enable caching
 	}
