@@ -1789,11 +1789,41 @@ function pmx_checkExtOpts($show, $itemData, $blockpagename = '')
 /**
 * check customer actions & subactions
 */
+
+//==========
+function parseRecursive($item, $regexp, $replace)
+{
+//  $regexp = array('/([\@\s\r\n\t]+)/', '/(\[host\=[a-zA-Z0-9\.\-\_\*\?\,\^]+\])/', '/([\^\,]+|)([a-zA-Z0-9\=\.\-\_\*\?\[\]\;\:\&\*\?\^\|]+)/');
+//  $replace = array('', '', "strpos('\\2',':')===false?'\\1:\\2':'\\0'");
+
+  if (is_array($item))
+    $item = $item[1];
+
+  return preg_replace_callback($regexp, 'parseRecursive', $item);
+}
+//==========
+
 function pmx_checkCustActions(&$bits, $item, $actname)
 {
-	global $context;
+	global $context, $replace;
 
-	preg_match_all($context['pmx']['ca_grep'], preg_replace($context['pmx']['ca_find'], $context['pmx']['ca_repl'], $item), $actions);
+	$context['pmx']['ca_find'] = array('/([\@\s\r\n\t]+)/', '/(\[host\=[a-zA-Z0-9\.\-\_\*\?\,\^]+\])/', '/([\^\,]+|)([a-zA-Z0-9\=\.\-\_\*\?\[\]\;\:\&\*\?\^\|]+)/e');
+	$context['pmx']['ca_repl'] = array('return "";', 'return "";', 'return strpos($fnd[2],":")===false?$fnd[1].":".$fnd[2]:$fnd[0];');
+
+  $result = '';
+  foreach($context['pmx']['ca_find'] as $key => $regex)
+  {
+    $regex = str_replace('/e', '/', $regex);
+    preg_match($regex, $item, $fnd);
+    if($fnd != array())
+    {
+      $item = str_replace($fnd[0], eval($context['pmx']['ca_repl'][$key]), $item);
+    }
+  }
+
+	preg_match_all($context['pmx']['ca_grep'], $item, $actions);
+
+//	preg_match_all($context['pmx']['ca_grep'], preg_replace($context['pmx']['ca_find'], $context['pmx']['ca_repl'], $item));
 	$key = $context['pmx']['ca_keys'][$actname];
 	$keyCtl = 1; $keyPos = 2; $actCtl = 3; $actPos = 4;
 
