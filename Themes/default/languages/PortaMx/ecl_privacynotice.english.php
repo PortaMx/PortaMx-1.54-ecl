@@ -4,14 +4,14 @@
 * Language file ecl_privacynotice.english
 *
 * \author PortaMx - Portal Management Extension
-* \author Copyright 2008-2014 by PortaMx corp. - http://portamx.com
-* \version 1.52
-* \date 18.08.2014
+* \author Copyright 2008-2012 by PortaMx - http://portamx.com
+* \version 2.0 Virgo
+* \date 30.05.2013
 */
 
 /*
 	Additional informations to this file format.
-	We have 4 tokens, they replaced at run time:
+	We have 3 tokens, they replaced at run time:
 	@site@   - replace with the Forum name
 	@host@   - replaced with the Domain name
 	@cookie@ - replaced the the cookie you have setup in SMF
@@ -100,6 +100,12 @@ $txt['pmx_ecl_headrows'] = array(
 		'@host@',
 		'Current session only',
 		'These cookies are set to records the current category and the state for a static Category block.',
+	),
+	array(
+		'pmx_shout{ID}',
+		'@host@',
+		'Current session only',
+		'These cookies are set to records the current state of a Shout box block.',
 	),
 	array(
 		'pmx_php_ckeck',
