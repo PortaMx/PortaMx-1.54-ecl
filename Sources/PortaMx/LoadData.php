@@ -867,7 +867,7 @@ function PortaMx_getSettings($from_eclinit = false)
 
 	// customer action vars
 	$context['pmx']['ca_find'] = array(0 => '/([\@\s\r\n\t]+)/', 1 => '/(\[host\=[a-zA-Z0-9\.\-\_\*\?\,\^]+\])/', 2 => '/([\^\,]+|)([a-zA-Z0-9\=\.\-\_\*\?\[\]\;\:\&\*\?\^\|]+)/');
-	$context['pmx']['ca_repl'] = array(0 => 'return "";', 1 => 'return "";', 2 => 'return strpos($fnd[2][0], ":") === false ? $fnd[1][0] .":". $fnd[2][0] : $fnd[0][0];');
+	$context['pmx']['ca_repl'] = array(0 => 'return "";', 1 => 'return "";', 2 => 'return !isset($fnd[2]) ? "" : (strpos($fnd[2], ":") === false ? $fnd[1] .":". $fnd[2] : $fnd[0]);');
 	$context['pmx']['ca_grep'] = '/(\^|)(a:|c:|p:|:|)([\&\^\|]+|)([a-zA-Z0-9\=\.\-\_\*\?\[\]\;]+)/';
 	$context['pmx']['ca_keys'] = array('action' => ':', 'art' => 'a:', 'cat' => 'c:', 'child' => 'c:', 'spage' => 'p:');
 
@@ -1642,7 +1642,8 @@ function pmx_checkExtOpts($show, $itemData, $blockpagename = '')
 		return $show;
 
 	// check exist items
-	$bits = pmx_setBits(null);
+  $bit = null;
+	$bits = pmx_setBits(&$bit);
 	foreach($checkitems as $item)
 	{
 		// convert elements for simpler checking
@@ -1795,8 +1796,9 @@ function pmx_checkCustActions(&$bits, $item, $actname)
 
 	foreach($context['pmx']['ca_find'] as $key => $regex)
 	{
-		preg_match($regex, $item, $fnd, PREG_OFFSET_CAPTURE);
-		$item = !empty($fnd) && trim($fnd[0][0]) != '' ? substr_replace($item, eval($context['pmx']['ca_repl'][$key]), $fnd[0][0], strlen($fnd[0][0])) : $item;
+		preg_match_all($regex, $item, $fndall, PREG_SET_ORDER);
+		foreach($fndall as $fnd)
+			$item = !empty($fnd) ? str_replace($fnd[0], eval($context['pmx']['ca_repl'][$key]), $item) : $item;
 	}
 
 	preg_match_all($context['pmx']['ca_grep'], $item, $actions);
