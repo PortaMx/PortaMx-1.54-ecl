@@ -1642,8 +1642,7 @@ function pmx_checkExtOpts($show, $itemData, $blockpagename = '')
 		return $show;
 
 	// check exist items
-  $bit = null;
-	$bits = pmx_setBits(&$bit);
+	$bits = pmx_setBits(null);
 	foreach($checkitems as $item)
 	{
 		// convert elements for simpler checking

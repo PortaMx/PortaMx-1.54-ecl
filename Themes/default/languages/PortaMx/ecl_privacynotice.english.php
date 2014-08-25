@@ -4,9 +4,9 @@
 * Language file ecl_privacynotice.english
 *
 * \author PortaMx - Portal Management Extension
-* \author Copyright 2008-2012 by PortaMx - http://portamx.com
-* \version 2.0 Virgo
-* \date 30.05.2013
+* \author Copyright 2008-2014 by PortaMx corp. - http://portamx.com
+* \version 1.52
+* \date 18.08.2014
 */
 
 /*
