@@ -519,15 +519,27 @@ function DoLogin()
 ]]></search>
 			<add><![CDATA[
 	if(!pmx_checkECL_Cookie())
-		return;
+	{
+		// Init  PortaMx if not loaded
+		if(empty($modSettings['pmxportal_disabled']) && !defined('PortaMx'))
+			PortaMx();
+
+		return pmx_ECL_Error('request');
+	}
 ]]></add>
 		</operation>
 
 		<operation>
 			<search position="replace"><![CDATA[
-		setcookie($cookiename . '_', implode(',', $_SESSION['ban']['cannot_access']['ids']), time() + 3153600, $cookie_url[1], $cookie_url[0], 0);
+			// A goodbye present.
+		require_once($sourcedir . '/Subs-Auth.php');
+		$cookie_url = url_parts(!empty($modSettings['localCookies']), !empty($modSettings['globalCookies']));
 ]]></search>
 			<add><![CDATA[
+		// A goodbye present.
+		require_once($sourcedir . '/Subs-Auth.php');
+		$cookie_url = url_parts(!empty($modSettings['localCookies']), !empty($modSettings['globalCookies']));
+
 		// PortaMx ecl cookie handling
 		if(!pmx_checkECL_Cookie())
 			setcookie($cookiename . '_', implode(',', $_SESSION['ban']['cannot_access']['ids']), time() + 3153600, $cookie_url[1], $cookie_url[0], 0);
@@ -535,12 +547,19 @@ function DoLogin()
 		</operation>
 
 		<operation>
-			<search position="before"><![CDATA[
+			<search position="replace"><![CDATA[
 		loadTemplate('Login');
 		$context['sub_template'] = 'kick_guest';
 		$context['robot_no_index'] = true;
 ]]></search>
 			<add><![CDATA[
+		if(!pmx_checkECL_Cookie())
+			return pmx_ECL_Error('login');
+
+		loadTemplate('Login');
+		$context['sub_template'] = 'kick_guest';
+		$context['robot_no_index'] = true;
+
 		// Init  PortaMx if not loaded
 		if(empty($modSettings['pmxportal_disabled']) && !defined('PortaMx'))
 			PortaMx(true);
