@@ -2778,6 +2778,15 @@ function PortaMx_headers($action = '')
 		$context['html_headers'] .= '
 		.pmxinfo{ padding-top: 0.5em !important;}';
 
+	if(strpos($settings['name'], 'SMF Default Theme') !== false)
+	{
+		$context['html_headers'] .= '
+		.pmxsb_top{border-top-left-radius:6px;margin-right:15px;padding-top:0;background-position-y:-91px !important;}
+		.pmxsb_top span{border-top-right-radius:6px;margin-right:-15px;background-position-y:-91px !important;}
+		.pmxsb_bot{border-bottom-left-radius:6px;margin-right:15px;height:11px;}
+		.pmxsb_bot span{border-bottom-right-radius:6px;margin-right:-15px;height:11px !important;}';
+		}
+
 	$context['html_headers'] .= '
 	</style>';
 

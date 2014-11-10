@@ -375,11 +375,11 @@ class pmxc_shoutbox extends PortaMxC_SystemBlock
 
 		echo '
 			<div id="bbcodes" style="position:absolute; z-index:9999; width:342px; height:110px; display:none">
-				<div class="'. $bodyclass .'">';
+				<div>';
 
 		if(empty($context['pmx_style_isCore']))
 			echo '
-					<span class="'. $spanclass . ($isCustFrame ? $this->cfg['config']['visuals']['frame'] .'_top' : 'upperframe') .'"><span></span></span>
+					<span class="'. $spanclass . ($isCustFrame ? $this->cfg['config']['visuals']['frame'] .'_top' : 'upperframe pmxsb_top') .'"><span></span></span>
 					<div class="'. $bodyclass .' roundframe shoutbox_round '. $this->cfg['config']['visuals']['frame'] .'" style="margin:auto; text-align:center;">';
 		else
 			echo '
@@ -419,7 +419,7 @@ class pmxc_shoutbox extends PortaMxC_SystemBlock
 							</select>
 						</div>
 					</div>
-					<span class="'. $spanclass . ($isCustFrame ? $this->cfg['config']['visuals']['frame'] .'_bot' : 'lowerframe') .'"><span></span></span>
+					<span class="'. $spanclass . ($isCustFrame ? $this->cfg['config']['visuals']['frame'] .'_bot' : 'lowerframe pmxsb_bot') .'"><span></span></span>
 				</div>
 			</div>';
 

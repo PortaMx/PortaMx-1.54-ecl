@@ -228,7 +228,6 @@ class pmxc_user_login extends PortaMxC_SystemBlock
 		{
 			echo '
 								<hr />'. $txt['pmx_langsel'] .'
-								<form id="pmxlangchg'.$this->cfg['id'].'" action="" method="post">
 									<div style="padding-top:3px;">
 										<select name="" style="width:98%;" onchange="ChangeLang'.$this->cfg['id'].'(this);">';
 
@@ -239,14 +238,12 @@ class pmxc_user_login extends PortaMxC_SystemBlock
 			echo '
 										</select>
 									</div>
-								</form>
-								<script language="JavaScript" type="text/javascript"><!-- // --><![CDATA[
-									function ChangeLang'.$this->cfg['id'].'(elm)
-									{
-										pmxWinGetTop(\'user'. $this->cfg['id'] .'\');
-										document.getElementById("pmxlangchg'.$this->cfg['id'].'").action = smf_scripturl + "?language=" + elm.options[elm.selectedIndex].value + ";pmxrd='. base64_encode(str_replace(array($scripturl, '?'), '', getCurrentUrl())) .'";
-										document.getElementById("pmxlangchg'.$this->cfg['id'].'").submit();
-									}
+									<script language="JavaScript" type="text/javascript"><!-- // --><![CDATA[
+										function ChangeLang'.$this->cfg['id'].'(elm)
+										{
+											pmxWinGetTop(\'user'. $this->cfg['id'] .'\');
+											window.location.href = smf_scripturl + "?language="+ elm.options[elm.selectedIndex].value'. (pmx_checkECL_Cookie() ? '+";pmxrd='. base64_encode(str_replace(array($scripturl, '?'), '', getCurrentUrl())) .'"' : '') .';
+										}
 								// ]]></script>';
 		}
 	}

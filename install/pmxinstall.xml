@@ -562,7 +562,7 @@ function DoLogin()
 
 		// Init  PortaMx if not loaded
 		if(empty($modSettings['pmxportal_disabled']) && !defined('PortaMx'))
-			PortaMx(true);
+			PortaMx();
 ]]></add>
 		</operation>
 	</file>

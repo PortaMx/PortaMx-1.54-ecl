@@ -1,0 +1,50 @@
+.Bold
+{
+	font-weight: bold;
+}
+.Title
+{
+	font-weight: bold;
+	font-size: 18px;
+	color: #cc3300;
+}
+.Code
+{
+	border: #8b4513 1px solid;
+	padding-right: 5px;
+	padding-left: 5px;
+	color: #000066;
+	font-family: 'Courier New' , Monospace;
+	background-color: #ff9933;
+}
+/* common list styles */
+ul.list_yellow, ul.list_blue, ul.list_red, ul.list_go, ul.list_plus
+{
+	margin: 0;
+	padding: 0.5em 2em 0.5em 2em;
+}
+ul.list_yellow li
+{
+	list-style-image: url(../../../Themes/default/PortaMx/SysCss/Images/bullet_yellow.gif);
+	list-style-position: outside;
+}
+ul.list_blue li
+{
+	list-style-image: url(../../../Themes/default/PortaMx/SysCss/Images/bullet_blue.gif);
+	list-style-position: outside;
+}
+ul.list_red li
+{
+	list-style-image: url(../../../Themes/default/PortaMx/SysCss/Images/bullet_red.gif);
+	list-style-position: outside;
+}
+ul.list_go li
+{
+	list-style-image: url(../../../Themes/default/PortaMx/SysCss/Images/bullet_go.gif);
+	list-style-position: outside;
+}
+ul.list_plus li
+{
+	list-style-image: url(../../../Themes/default/PortaMx/SysCss/Images/bullet_plus.gif);
+	list-style-position: outside;
+}

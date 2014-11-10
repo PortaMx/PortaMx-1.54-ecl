@@ -1,0 +1,118 @@
+/*
+Copyright (c) 2003-2013, CKSource - Frederico Knabben. All rights reserved.
+For licensing, see LICENSE.html or http://ckeditor.com/license
+*/
+body {
+	font-family: sans-serif, Arial, Verdana, "Trebuchet MS";
+	font-size: 12px;
+	color: #333;
+	background-color: #fff;
+	margin: 0px;
+	padding: 5px;
+}
+.cke_editable {
+	font-size: 13px;
+	line-height: 1.6em;
+}
+a {
+	color: #0782C1;
+}
+ol,ul,dl {
+	*margin-right: 0px;
+	padding: 0 35px;
+}
+h1,h2,h3,h4,h5,h6 {
+	font-weight: normal;
+	line-height: 1.2em;
+}
+hr {
+	border: 0px;
+	border-top: 1px solid #ccc;
+}
+img.right {
+    border: 1px solid #ccc;
+    float: right;
+    margin-left: 15px;
+    padding: 5px;
+}
+img.left {
+    border: 1px solid #ccc;
+    float: left;
+    margin-right: 15px;
+    padding: 5px;
+}
+img:hover {
+	opacity: .9;
+	filter: alpha(opacity = 90);
+}
+pre {
+	white-space: pre-wrap; /* CSS 2.1 */
+	word-wrap: break-word; /* IE7 */
+}
+.prettyprint {
+	font-size: 11px;
+	line-height: 1.1em;
+	border: solid 1px #b0b0b0;
+	border-radius: 5px;
+	background-color: #f0f0f0;
+	padding: 5px;
+}
+blockquote {
+	background: url(../Themes/default/PortaMx/SysCss/Images/quote.png) 2px 3px no-repeat;
+	text-indent: 16px;
+	border-left: solid 6px #b0b0b0 !important;
+	border-top: solid 1px #b0b0b0 !important;
+	border-top-left-radius: 5px;
+	padding: 5px;
+	font-style: italic;
+	font-size: 0.9em;
+	line-height: 1.3em;
+	background-color: #e0e8f8;
+}
+.avatar {
+	border-radius: 5px;
+	border: 1px solid #e0e0e0;
+}
+.marker {
+	background-color: Yellow;
+}
+/* list styles */
+.ol {
+	list-style: decimal outside;
+	*margin-right: 0px;
+	padding: 0 35px;
+}
+.ul {
+	list-style: disc outside;
+	*margin-right: 0px;
+	padding: 0 35px;
+}
+.bbc_list {
+	text-align: left;
+	padding: 0 35px;
+	list-style-type: inherit;
+}
+ul.list_yellow, ul.list_blue, ul.list_red, ul.list_go, ul.list_plus {
+	margin: 0;
+	padding: 0.5em 2em 0.5em 2em;
+}
+ul.list_yellow {
+	list-style-image: url(../Themes/default/PortaMx/SysCss/Images/bullet_yellow.gif);
+	list-style-position: outside;
+}
+ul.list_blue {
+	list-style-image: url(../Themes/default/PortaMx/SysCss/Images/bullet_blue.gif);
+	list-style-position: outside;
+}
+ul.list_red {
+	list-style-image: url(../Themes/default/PortaMx/SysCss/Images/bullet_red.gif);
+	list-style-position: outside;
+}
+ul.list_go {
+	list-style-image: url(../Themes/default/PortaMx/SysCss/Images/bullet_go.gif);
+	list-style-position: outside;
+}
+ul.list_plus {
+	list-style-image: url(../Themes/default/PortaMx/SysCss/Images/bullet_plus.gif);
+	list-style-position: outside;
+}

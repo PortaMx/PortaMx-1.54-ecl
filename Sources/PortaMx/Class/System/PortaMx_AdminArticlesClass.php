@@ -58,7 +58,7 @@ class PortaMxC_SystemAdminArticle extends PortaMxC_AdminArticles
 	*/
 	function pmxc_ShowAdmArticleConfig()
 	{
-		global $context, $settings, $modSettings, $options, $user_info, $txt;
+		global $context, $settings, $boarddir, $modSettings, $options, $user_info, $txt;
 
 		// directions
 		$LtR = empty($context['right_to_left']) ? 'left' : 'right';
@@ -228,7 +228,19 @@ class PortaMxC_SystemAdminArticle extends PortaMxC_AdminArticles
 
 		// show the wysiwyg editor
 		if($this->cfg['ctype'] == 'html')
-			PortaMx_EditContent_xhtml('content', $this->cfg['content']);
+		{
+			// show the wysiwyg editor
+			echo '
+									<textarea name="'. $context['pmx']['htmledit']['id'] .'">'. $context['pmx']['htmledit']['content'] .'</textarea>';
+
+			$allow = allowPmx('pmx_admin, pmx_create, pmx_articles');
+			$filepath = '/'. str_replace($_SERVER['DOCUMENT_ROOT'], '', str_replace('\\', '/', $boarddir)) .'/editor_uploads/images';
+			$_SESSION['pmx_ckfm'] = array('ALLOW' => $allow, 'FILEPATH' => $filepath);
+			echo '
+									<script language="JavaScript" type="text/javascript">
+										CKEDITOR.replace("'. $context['pmx']['htmledit']['id'] .'", {filebrowserBrowseUrl: "ckeditor/fileman/index.php"});
+									</script>';
+		}
 		else
 		{
 			if($this->cfg['ctype'] == 'bbc')
