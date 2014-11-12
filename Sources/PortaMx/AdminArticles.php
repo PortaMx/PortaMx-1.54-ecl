@@ -821,7 +821,8 @@ function PortaMx_AdminArticles()
 			elseif(empty($_POST['save_edit']))
 			{
 				// prepare the editor
-				PortaMx_EditArticle($article['ctype'], 'content', $article['content']);
+				if($article['ctype'] != 'html')
+					PortaMx_EditArticle($article['ctype'], 'content', $article['content']);
 
 				// load the class file and create the object
 				require_once($context['pmx_sysclassdir']. 'PortaMx_AdminArticlesClass.php');

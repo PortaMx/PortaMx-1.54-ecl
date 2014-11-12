@@ -39,7 +39,7 @@ function PortaMx_checkPOST()
 */
 function PortaMx_getAdmEditBlock($id = null, $block = null, $side = null)
 {
-	global $smcFunc, $context, $sourcedir, $boardurl, $modSettings, $options, $user_info;
+	global $smcFunc, $context, $sourcedir, $modSettings, $options, $user_info;
 
 	// new block ?
 	if(is_null($id))
@@ -139,17 +139,6 @@ function PortaMx_getAdmEditBlock($id = null, $block = null, $side = null)
 		if(in_array($block['blocktype'], array('bbc_script', 'download')))
 			PortaMx_getSmileys();
 	}
-	// for html blocks
-	elseif($block['blocktype'] == 'html')
-	{
-		$context['html_headers'] .= '
-	<script type="text/javascript" src="'. $boardurl .'/ckeditor/ckeditor.js"></script>';
-
-		$context['pmx']['htmledit'] = array(
-			'id' => 'content',
-			'content' => htmlspecialchars($block['content'], ENT_NOQUOTES),
-		);
-	}
 
 	require_once($context['pmx_classdir']. $block['blocktype'] .'_adm.php');
 	$block_type = 'pmxc_'. $block['blocktype'] .'_adm';
@@ -161,100 +150,106 @@ function PortaMx_getAdmEditBlock($id = null, $block = null, $side = null)
 }
 
 /**
+* load the xhtml editor.
+* field: name of a input element.
+* content: the content in the editor or empty.
+*/
+function PortaMx_EditContent_xhtml($field, $content, $toolbar = 'Default', $height = '400')
+{
+	global $context, $boarddir;
+
+	$context['pmx']['settings']['xbarkeys'] = 0;		// disable xBarKeys
+	require_once($boarddir .'/fckeditor/fckeditor.php');
+
+	$oFCKeditor = new FCKeditor($field);
+	$oFCKeditor->BasePath = str_replace('//', '/', str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'])) .'/fckeditor/');
+	$oFCKeditor->Height = $height .'px';
+	$oFCKeditor->ToolbarSet = $toolbar;
+	$oFCKeditor->Value = $content;
+	$oFCKeditor->Create();
+}
+
+/**
 * load the article editor by article type.
 * field: name of a input element.
 * content: the content in the editor or empty.
 */
 function PortaMx_EditArticle($type, $field, $content)
 {
-	global $context, $sourcedir, $boardurl, $modSettings, $options, $user_info;
+	global $context, $sourcedir, $modSettings, $options, $user_info;
 
-	// for html blocks
-	if($type == 'html')
+	// create the SMF editor.
+	require_once($sourcedir . '/Subs-Editor.php');
+	$options['wysiwyg_default'] = false;
+
+	if($type == 'php')
 	{
-		$context['html_headers'] .= '
-	<script type="text/javascript" src="'. $boardurl .'/ckeditor/ckeditor.js"></script>';
+		$modSettings['disable_wysiwyg'] = true;
+		if(preg_match('~\[\?pmx_initphp(.*)pmx_initphp\?\]~is', $content, $match))
+			$cont = $match[1];
+		else
+			$cont = '';
 
-		$context['pmx']['htmledit'] = array(
-			'id' => 'content',
-			'content' => htmlspecialchars($content, ENT_NOQUOTES),
+		$editorOptionsInit = array(
+			'id' => 'content_init',
+			'value' => htmlspecialchars($cont, ENT_NOQUOTES),
+			'width' => '100%',
+			'height' => '200px',
+			'labels' => array(),
+			'preview_type' => 0,
+			'bbc_level' => 0,
+			'disable_smiley_box' => 1,
+			'force_rich' => false,
+		);
+
+		create_control_richedit($editorOptionsInit);
+		$context['pmx']['editorID_init'] = array(
+			'id' => $editorOptionsInit['id'],
+			'havecont' => !empty($cont),
+		);
+
+		if(preg_match('~\[\?pmx_showphp(.*)pmx_showphp\?\]~is', $content, $match))
+			$cont = $match[1];
+		else
+			$cont = $content;
+
+		$editorOptions = array(
+			'id' => 'content_show',
+			'value' => htmlspecialchars($cont, ENT_NOQUOTES),
+			'width' => '100%',
+			'height' => '200px',
+			'labels' => array(),
+			'preview_type' => 0,
+			'bbc_level' => 0,
+			'disable_smiley_box' => 1,
+			'force_rich' => false,
 		);
 	}
 	else
 	{
-		// create the SMF editor.
-		require_once($sourcedir . '/Subs-Editor.php');
-		$options['wysiwyg_default'] = false;
-
-		if($type == 'php')
-		{
+		if($type == 'code')
 			$modSettings['disable_wysiwyg'] = true;
-			if(preg_match('~\[\?pmx_initphp(.*)pmx_initphp\?\]~is', $content, $match))
-				$cont = $match[1];
-			else
-				$cont = '';
 
-			$editorOptionsInit = array(
-				'id' => 'content_init',
-				'value' => htmlspecialchars($cont, ENT_NOQUOTES),
-				'width' => '100%',
-				'height' => '200px',
-				'labels' => array(),
-				'preview_type' => 0,
-				'bbc_level' => 0,
-				'disable_smiley_box' => 1,
-				'force_rich' => false,
-			);
-
-			create_control_richedit($editorOptionsInit);
-			$context['pmx']['editorID_init'] = array(
-				'id' => $editorOptionsInit['id'],
-				'havecont' => !empty($cont),
-			);
-
-			if(preg_match('~\[\?pmx_showphp(.*)pmx_showphp\?\]~is', $content, $match))
-				$cont = $match[1];
-			else
-				$cont = $content;
-
-			$editorOptions = array(
-				'id' => 'content_show',
-				'value' => htmlspecialchars($cont, ENT_NOQUOTES),
-				'width' => '100%',
-				'height' => '200px',
-				'labels' => array(),
-				'preview_type' => 0,
-				'bbc_level' => 0,
-				'disable_smiley_box' => 1,
-				'force_rich' => false,
-			);
-		}
-		else
-		{
-			if($type == 'code')
-				$modSettings['disable_wysiwyg'] = true;
-
-			$editorOptions = array(
-				'id' => $field,
-				'value' => htmlspecialchars($content, ENT_NOQUOTES),
-				'width' => '100%',
-				'height' => '300px',
-				'labels' => array(),
-				'preview_type' => 0,
-				'bbc_level' => ($type == 'script' ? 0 : 'full'),
-				'disable_smiley_box' => ($type == 'code' ? 1 : 0),
-				'force_rich' => false,
-			);
-		}
-		if($type == 'bbc')
-			$_REQUEST[$field . '_mode'] = '';
-
-		create_control_richedit($editorOptions);
-		$context['pmx']['editorID'] = $editorOptions['id'];
-
-		if($type == 'bbc')
-			PortaMx_getSmileys();
+		$editorOptions = array(
+			'id' => $field,
+			'value' => htmlspecialchars($content, ENT_NOQUOTES),
+			'width' => '100%',
+			'height' => '300px',
+			'labels' => array(),
+			'preview_type' => 0,
+			'bbc_level' => ($type == 'script' ? 0 : 'full'),
+			'disable_smiley_box' => ($type == 'code' ? 1 : 0),
+			'force_rich' => false,
+		);
 	}
+	if($type == 'bbc')
+		$_REQUEST[$field . '_mode'] = '';
+
+	create_control_richedit($editorOptions);
+	$context['pmx']['editorID'] = $editorOptions['id'];
+
+	if($type == 'bbc')
+		PortaMx_getSmileys();
 }
 
 /**
@@ -303,9 +298,9 @@ function PortaMx_getSmileys()
 	$context['smileys'] = array(
 		'postform' => array(
 			array(
-				'smileys' => $smileys,
-				'isLast' => true
-			),
+        'smileys' => $smileys,
+        'isLast' => true
+      ),
 		),
 		'popup' => array(),
 	);
@@ -321,14 +316,14 @@ function PortaMx_HTMLtoBBC($content)
 	$html = array(
 		'~span\sclass="bbc_tt">(.+?)</span>~i' => '[tt]$1[/tt]',
 		'~<tt>(.+?)</tt>~i' => '[tt]$1[/tt]',
-		'~<div([^>]*)>~i' => '[bbcdiv$1]',
-		'~</div>~i' => '[/bbcdiv]',
-		'~<span([^>]*)>~i' => '[bbcspan$1]',
-		'~</span>~i' => '[/bbcspan]',
-		'~<p([^>]*)>~i' => '[bbcp$1]',
-		'~</p>~i' => '[/bbcp]',
+    '~<div([^>]*)>~i' => '[bbcdiv$1]',
+    '~</div>~i' => '[/bbcdiv]',
+    '~<span([^>]*)>~i' => '[bbcspan$1]',
+    '~</span>~i' => '[/bbcspan]',
+    '~<p([^>]*)>~i' => '[bbcp$1]',
+    '~</p>~i' => '[/bbcp]',
 		'~<img([^>]*)>~i' => '[bbcimg$1]',
-		'~<br([^>]*)>~i' => '[bbcbr]',
+    '~<br([^>]*)>~i' => '[bbcbr]',
 	);
 	$content = preg_replace(array_keys($html), array_values($html), $content);
 

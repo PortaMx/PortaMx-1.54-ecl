@@ -149,7 +149,7 @@ function template_main()
 						<input class="button_submit" type="button" value="'. $txt['pmx_save'] .'" name="" onclick="pmxSendArtMove()" />
 					</div>
 				</div>
-				<span class="lowerframe pmxsb_bot"><span></span></span>
+				<span class="lowerframe"><span></span></span>
 			</div>';
 		// end Move popup
 
@@ -170,7 +170,7 @@ function template_main()
 						<input class="button_submit" type="button" value="'. $txt['pmx_create'] .'" name="" onclick="pmxSendArticleType()" />
 					</div>
 				</div>
-				<span class="lowerframe pmxsb_bot"><span></span></span>
+				<span class="lowerframe"><span></span></span>
 			</div>';
 		// end popup
 
@@ -221,7 +221,7 @@ function template_main()
 						<input class="button_submit" type="button" value="'. $txt['pmx_save'] .'" name="" onclick="pmxSendFilter()" />
 					</div>
 				</div>
-				<span class="lowerframe pmxsb_bot"><span></span></span>
+				<span class="lowerframe"><span></span></span>
 			</div>';
 		// end filter popup
 
@@ -348,7 +348,7 @@ function template_main()
 					<img id="pWind.icon" style="padding-top:7px; vertical-align:top;" src="" alt="" />
 					<div style="clear:both;"></div>
 				</div>
-				<span class="lowerframe pmxsb_bot"><span></span></span>
+				<span class="lowerframe"><span></span></span>
 			</div>';
 			// end title edit popup
 
@@ -365,7 +365,7 @@ function template_main()
 					<div id="pWind.info.text">
 					</div>
 				</div>
-				<span class="lowerframe pmxsb_bot"><span></span></span>
+				<span class="lowerframe"><span></span></span>
 			</div>
 			<div style="display:none;">
 				<span id="pWind.title.txt">'. $txt['pmx_article_information'] .'<br /></span>
@@ -421,7 +421,7 @@ function template_main()
 						<input class="button_submit" type="button" value="'. $txt['pmx_update_all'] .'" name="" onclick="pmxUpdateCats(\'all\')" />
 					</div>
 				</div>
-				<span class="lowerframe pmxsb_bot"><span></span></span>
+				<span class="lowerframe"><span></span></span>
 			</div>';
 			// end categorie popup
 
@@ -454,7 +454,7 @@ function template_main()
 						<input id="acs_all_button" class="button_submit" type="button" value="'. $txt['pmx_update_all'] .'" name="" onclick="pmxUpdateAcs(\'all\')" />
 					</div>
 				</div>
-				<span class="lowerframe pmxsb_bot"><span></span></span>
+				<span class="lowerframe"><span></span></span>
 			</div>';
 			// end Access popup
 		}

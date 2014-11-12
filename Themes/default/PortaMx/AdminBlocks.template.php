@@ -95,7 +95,7 @@ function template_main()
 		<div class="cat_bar"><h3 class="catbg">'. $txt['pmx_blocks'] .'</h3></div>
 		<span class="upperframe"><span></span></span>
 		<div class="roundframe">'. $txt['pmx_admBlk_desc'] .'</div>
-		<span class="lowerframe "><span></span></span>';
+		<span class="lowerframe"><span></span></span>';
 
 	if(empty($context['pmx_style_isCore']))
 	{
@@ -186,7 +186,7 @@ function template_main()
 						<input class="button_submit" type="button" value="'. $txt['pmx_create'] .'" name="" onclick="pmxSendBlockType()" />
 					</div>
 				</div>
-				<span class="lowerframe pmxsb_bot"><span></span></span>
+				<span class="lowerframe"><span></span></span>
 			</div>';
 		// end blocktype popup
 
@@ -323,7 +323,7 @@ function template_main()
 						<input class="button_submit" type="button" value="'. $txt['pmx_save'] .'" name="" onclick="pmxSendRowMove()" />
 					</div>
 				</div>
-				<span class="lowerframe pmxsb_bot"><span></span></span>
+				<span class="lowerframe"><span></span></span>
 			</div>';
 		// end Move popup
 
@@ -372,7 +372,7 @@ function template_main()
 					<img id="pWind.icon" style="padding-top:7px; vertical-align:top;" src="" alt="" />
 					<div style="clear:both;"></div>
 				</div>
-				<span class="lowerframe pmxsb_bot"><span></span></span>
+				<span class="lowerframe"><span></span></span>
 			</div>';
 			// end title edit popup
 
@@ -405,7 +405,7 @@ function template_main()
 						<input id="acs_all_button" class="button_submit" type="button" value="'. $txt['pmx_update_all'] .'" name="" onclick="pmxUpdateAcs(\'all\')" />
 					</div>
 				</div>
-				<span class="lowerframe pmxsb_bot"><span></span></span>
+				<span class="lowerframe"><span></span></span>
 			</div>';
 			// end Access popup
 
@@ -435,7 +435,7 @@ function template_main()
 					</select>
 					<input style="float:'. $RtL .'" class="button_submit" type="button" value="'. $txt['pmx_save'] .'" name="" onclick="pmxSendCloneMove()" />
 				</div>
-				<span class="lowerframe pmxsb_bot"><span></span></span>
+				<span class="lowerframe"><span></span></span>
 			</div>';
 			// end Clone / Move popup
 	}

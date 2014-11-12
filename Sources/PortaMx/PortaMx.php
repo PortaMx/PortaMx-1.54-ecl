@@ -29,36 +29,16 @@ function PortaMx($doinit = false)
 	// redirect page requests (use cookie)
 	if(isset($_GET['pg']) && is_array($_GET['pg']))
 	{
-		if(pmx_checkECL_Cookie())
-		{
-			$key = key($_GET['pg']);
-			pmx_setcookie('pgidx_'. $key, $_GET['pg'][$key]);
-			unset($_GET['pg']);
-			redirectexit(pmx_http_build_query($_GET));
-		}
-		else
-		{
-			$_POST['pg'] = $_GET['pg'];
-			unset($_GET['pg']);
-		}
+		$key = key($_GET['pg']);
+		pmx_setcookie('pgidx_'. $key, $_GET['pg'][$key]);
+		unset($_GET['pg']);
+		redirectexit(pmx_http_build_query($_GET));
 	}
 
 	// check if a language change requested
 	if(isset($_REQUEST['language']) && isset($_REQUEST['pmxrd']))
 	{
 		clean_cache();
-		if (!empty($modSettings['userLanguage']) && (!empty($_GET['language']) || !empty($_SESSION['language'])))
-			$languages = getLanguages();
-
-		// Allow the user to change their language if its valid.
-		if (!empty($modSettings['userLanguage']) && !empty($_GET['language']) && isset($languages[strtr($_GET['language'], './\\:', '____')]))
-		{
-			$user_info['language'] = strtr($_GET['language'], './\\:', '____');
-			$_SESSION['language'] = $user_info['language'];
-		}
-		elseif (!empty($modSettings['userLanguage']) && !empty($_SESSION['language']) && isset($languages[strtr($_SESSION['language'], './\\:', '____')]))
-			$user_info['language'] = strtr($_SESSION['language'], './\\:', '____');
-
 		redirectexit(base64_decode($_REQUEST['pmxrd']));
 	}
 

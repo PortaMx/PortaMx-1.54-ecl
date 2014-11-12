@@ -211,7 +211,7 @@ function template_main()
 					<img id="pWind.icon" style="padding-top:7px; vertical-align:top;" src="" alt="" />
 					<div style="clear:both;"></div>
 				</div>
-				<span class="lowerframe pmxsb_bot"><span></span></span>
+				<span class="lowerframe"><span></span></span>
 			</div>';
 			// end title edit popup
 
@@ -233,7 +233,7 @@ function template_main()
 						<input class="button_submit" type="button" value="'. $txt['pmx_update_save'] .'" name="" onclick="pmxUpdateCatName()" />
 					</div>
 				</div>
-				<span class="lowerframe pmxsb_bot"><span></span></span>
+				<span class="lowerframe"><span></span></span>
 			</div>';
 			// end Categorie name popup
 
@@ -245,7 +245,7 @@ function template_main()
 					<div id="artsort" class="smalltext" style="max-height: 30px; overflow:auto;"></div><hr />
 					<div id="showarts" style="max-height: 170px; overflow:auto;"></div>
 				</div>
-				<span class="lowerframe pmxsb_bot"><span></span></span>
+				<span class="lowerframe"><span></span></span>
 			</div>';
 			// start articles in cat popup
 
@@ -278,7 +278,7 @@ function template_main()
 						<input id="acs_all_button" class="button_submit" type="button" value="'. $txt['pmx_update_all'] .'" name="" onclick="pmxUpdateAcs(\'all\')" />
 					</div>
 				</div>
-				<span class="lowerframe pmxsb_bot"><span></span></span>
+				<span class="lowerframe"><span></span></span>
 			</div>';
 			// end Access popup
 
@@ -322,7 +322,7 @@ function template_main()
 						<input class="button_submit" type="button" value="'. $txt['pmx_save'] .'" name="" onclick="pmxSaveMove()" />
 					</div>
 				</div>
-				<span class="lowerframe pmxsb_bot"><span></span></span>
+				<span class="lowerframe"><span></span></span>
 			</div>';
 			// end Move popup
 		}

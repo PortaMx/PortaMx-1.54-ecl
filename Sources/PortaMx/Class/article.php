@@ -96,6 +96,8 @@ class pmxc_article extends PortaMxC_SystemBlock
 								// have a custom cssfile, load
 								if(!empty($row['config']['cssfile']))
 									$this->getCustomCSS($row);
+								else
+									$row['customclass'] = '';
 
 								$row['side'] = $this->cfg['side'];
 								$row['blocktype'] = (!empty($this->cfg['config']['static_block']) ? 'static_article' : 'article');
@@ -128,6 +130,10 @@ class pmxc_article extends PortaMxC_SystemBlock
 					if(empty($context['pmx']['pagenames']['art']))
 						$context['pmx']['pagenames']['art'] = htmlspecialchars($this->articles[0]['name'], ENT_QUOTES);
 				}
+
+				if(!isset($_GET['cat']) && empty($this->cfg['config']['static_block']) && !empty($context['pmx']['settings']['topfragment']))
+					$context['pmx']['html_footer'] .= '
+						window.location.href = window.location.href.replace(/#topart'. $this->articles[0]['id'] .'/g, "") + "#topart'. $this->articles[0]['id'] .'";';
 			}
 			else
 				$this->visible = false;
@@ -154,24 +160,25 @@ class pmxc_article extends PortaMxC_SystemBlock
 			if(!empty($this->cfg['uniID']) && $count == count($this->articles))
 				$article['uniID'] = $this->cfg['uniID'];
 
-			if($this->cfg['config']['settings']['usedframe'] != 'block')
+			if($this->cfg['config']['settings']['usedframe'] == 'block')
 			{
 				if(count($this->articles) > 1)
 				{
 					$article['config']['collapse'] = 0;
 					$count--;
 
-					Pmx_Frame_top($article, $count);
+					$artdata = Pmx_Frame_top($article, $count);
 					$this->WriteContent($article);
+					Pmx_Frame_bottom($article, $artdata);
 				}
 				else
 					$this->WriteContent($article);
 			}
 			else
 			{
-//				Pmx_Frame_top($article, $count);
+				$artdata = Pmx_Frame_top($article, $count);
 				$this->WriteContent($article);
-//				Pmx_Frame_bottom($article);
+				Pmx_Frame_bottom($article, $artdata);
 			}
 		}
 	}

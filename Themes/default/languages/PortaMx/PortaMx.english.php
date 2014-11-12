@@ -140,7 +140,6 @@ $txt['pmxelc_privacy_failed'] = 'No Privacy Notice exists.';
 $txt['pmxelc_failed_login'] = 'You can\'t Login without accept the Cookie storage!';
 $txt['pmxelc_failed_register'] = 'You can\'t Register a account without accept the Cookie storage!';
 $txt['pmxelc_failed_request'] = 'You can\'t perform the current request without accept the Cookie storage!';
-$txt['pmxelc_failed_access'] = 'You have not enough rights to perform the current request!';
 
 // who display
 $txt['pmx_who_frontpage'] = 'Viewing the front page';

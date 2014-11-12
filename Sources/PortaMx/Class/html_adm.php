@@ -77,7 +77,7 @@ class pmxc_html_adm extends PortaMxC_SystemAdminBlock
 	*/
 	function pmxc_AdmBlock_content()
 	{
-		global $context, $boarddir, $txt;
+		global $txt;
 
 		// show the content area
 		echo '
@@ -86,17 +86,8 @@ class pmxc_html_adm extends PortaMxC_SystemAdminBlock
 							<h4 class="catbg catbg_grid"><span class="cat_left_title">'. $txt['pmx_edit_content'] .'</span></h4>
 						</div>';
 
-		// show the wysiwyg editor
-		echo '
-						<textarea name="'. $context['pmx']['htmledit']['id'] .'">'. $context['pmx']['htmledit']['content'] .'</textarea>';
-
-		$allow = allowPmx('pmx_admin') || allowPmx('pmx_blocks');
-		$filepath = '/'. str_replace($_SERVER['DOCUMENT_ROOT'], '', str_replace('\\', '/', $boarddir)) .'/editor_uploads/images';
-		$_SESSION['pmx_ckfm'] = array('ALLOW' => $allow, 'FILEPATH' => $filepath);
-		echo '
-						<script language="JavaScript" type="text/javascript">
-							CKEDITOR.replace("'. $context['pmx']['htmledit']['id'] .'", {filebrowserBrowseUrl: "ckeditor/fileman/index.php"});
-						</script>';
+						// show the wysiwyg editor
+						PortaMx_EditContent_xhtml('content', $this->cfg['content']);
 
 		echo '
 					</td>

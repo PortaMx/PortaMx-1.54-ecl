@@ -43,7 +43,7 @@ class PortaMxC_Blocks
 		// load the config
 		if(isset($blockconfig['config']))
 			$blockconfig['config'] = unserialize($blockconfig['config']);
-		$this->cfg = $blockconfig;
+  	$this->cfg = $blockconfig;
 		$this->startpage = 0;
 		$this->inBlockCall = $this->cfg['side'] == 'bib';
 		$this->cfg['uniID'] = 'blk'. $this->cfg['id'] .(!empty($this->inBlockCall) ? '-0' : '');
@@ -152,11 +152,12 @@ class PortaMxC_Blocks
 		// hide pageindex if only one page..
 		if($items > $pageitems)
 		{
-			if(isset($_POST['pg']) && is_array($_POST['pg']) && array_key_exists($this->cfg['uniID'], $_POST['pg']))
+			if(isset($_GET['pg']) && is_array($_GET['pg']) && array_key_exists($this->cfg['uniID'], $_GET['pg']))
 			{
-				$page = $_POST['pg'][$this->cfg['uniID']];
-				unset($_POST['pg'][$this->cfg['uniID']]);
+				$page = $_GET['pg'][$this->cfg['uniID']];
+				unset($_GET['pg'][$this->cfg['uniID']]);
 				$this->startpage = $page;
+				pmx_setcookie('pgidx_'. $this->cfg['uniID'], $page);
 			}
 			elseif(($cook = pmx_getcookie('pgidx_'. $this->cfg['uniID'])) && !is_null($cook))
 				$this->startpage = $cook;
@@ -329,7 +330,7 @@ class PortaMxC_Blocks
 	*/
 	function get_isRead()
 	{
-		$res = array('topic' => 0, 'msg' => 0);
+    $res = array('topic' => 0, 'msg' => 0);
 		if(!empty($_REQUEST['topic']))
 		{
 			$curTopic = explode('.', $_REQUEST['topic']);							// topicID
