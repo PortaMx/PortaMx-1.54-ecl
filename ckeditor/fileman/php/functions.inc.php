@@ -75,10 +75,10 @@ function verifyPath($path){
 	}
 }
 function fixPath($path){
-	$path = $_SERVER['DOCUMENT_ROOT'].'/'.$path;
+	$path = rtrim($_SERVER['DOCUMENT_ROOT'], '/').'/'.$path;
 	$path = str_replace('\\', '/', $path);
 	$path = str_replace('//', '/', $path);
-	return $path;
+	return str_replace('//', '/', $path);
 }
 function gerResultStr($type, $str = ''){
 	return '{"res":"'.  addslashes($type).'","msg":"'.  addslashes($str).'"}';
@@ -90,11 +90,14 @@ function getErrorRes($str = ''){
 	return gerResultStr('error', $str);
 }
 function getFilesPath(){
-	if(empty($_SESSION['pmx_ckfm']))
+	if(defined('FILEPATH'))
+		return FILEPATH;
+	elseif(empty($_SESSION['pmx_ckfm']))
+	{
 		include_once('system_smf.php');
-
-	if(!empty($_SESSION['pmx_ckfm']['FILEPATH']))
-		return $_SESSION['pmx_ckfm']['FILEPATH'];
+		define('FILEPATH', $_SESSION['pmx_ckfm']['FILEPATH']);
+		return FILEPATH;
+	}
 	else {
 		$ret = RoxyFile::FixPath(BASE_PATH.'/Uploads');
 		$ret = str_replace(RoxyFile::FixPath($_SERVER['DOCUMENT_ROOT']), '', $ret);
@@ -113,7 +116,6 @@ function listDirectory($path){
 			closedir($d);
 		}
 	}
-
 	return $ret;
 }
 class RoxyFile{
@@ -129,7 +131,6 @@ class RoxyFile{
 				@unlink($dir.$testFile);
 			}
 		}
-
 		return $ret;
 	}
 	static function CanUploadFile($filename){
@@ -140,7 +141,6 @@ class RoxyFile{
 
 		if((empty($forbidden) || !in_array($ext, $forbidden)) && (empty($allowed) || in_array($ext, $allowed)))
 			$ret = true;
-
 		return $ret;
 	}
 	static function ZipAddDir($path, $zip, $zipPath){

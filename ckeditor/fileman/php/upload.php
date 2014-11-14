@@ -36,7 +36,7 @@ if(is_dir(fixPath($path))){
       $filename = $_FILES['files']['name'][$k];
       $filename = RoxyFile::MakeUniqueFilename(fixPath($path), $filename);
       $filePath = fixPath($path).'/'.$filename;
-      if(!RoxyFile::CanUploadFile($filename))
+       if(!RoxyFile::CanUploadFile($filename))
         $errorsExt[] = $filename;
       elseif(!move_uploaded_file($v, $filePath))
          $errors[] = $filename; 
