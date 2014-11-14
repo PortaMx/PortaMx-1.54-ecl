@@ -5,8 +5,8 @@
 *
 * \author PortaMx - Portal Management Extension
 * \author Copyright 2008-2014 by PortaMx corp. - http://portamx.com
-* \version 1.52
-* \date 18.08.2014
+* \version 1.53
+* \date 14.11.2014
 */
 
 if(!defined('SMF'))
@@ -32,34 +32,21 @@ if(@version_compare(PHP_VERSION, '5.1.2') < 0)
 */
 function pmx_ECL_Init()
 {
-	global $user_info, $context, $maintenance, $settings, $modSettings, $txt;
+	global $user_info, $context, $maintenance, $settings, $modSettings, $txt, $scripturl;
 
 	if(WIRELESS && !empty($_GET['accepteclcoookie']) && $_GET['accepteclcoookie'] = 'yes')
 	{
 		pmx_setECL_Cookie();
-		redirectexit();
+		redirectexit($scripturl);
 	}
 	else
 	{
 		$context['html_headers'] .= '
 	<style type="text/css">
-	#ecl_privacy
-	{
-		font-size: 1.0em;
-		line-height: 1.3em;
-	}
-	#ecl_privacy td
-	{
-		padding: 0 10px 5px 0;
-	}
-	#ecl_privacy td strong
-	{
-		text-decoration: underline;
-	}
-	#ecl_privacy p
-	{
-		margin-top: 0px;
-	}
+	#ecl_privacy{font-size: 1.0em;line-height: 1.3em;}
+	#ecl_privacy td{padding: 0 10px 5px 0;}
+	#ecl_privacy td strong{text-decoration: underline;}
+	#ecl_privacy p{margin-top: 0px;}
 	</style>
 	<script language="JavaScript" type="text/javascript"><!-- // --><![CDATA[
 		function Setlang(elm){window.location.href = elm.options[elm.selectedIndex].value;}
@@ -99,7 +86,7 @@ function pmx_eclnonemodal()
 		if(file_exists($settings['theme_dir'] .'/css/pmx_eclnomodal.css'))
 			$cssfile = $settings['theme_url'] .'/css/pmx_eclnomodal.css';
 		else
-			$cssfile = $settings['default_theme_url'] .'/PortaMx/SysCss/pmx_eclnomodal.css';
+			$cssfile = PortaMx_loadCompressed('pmx_eclnomodal.css', array('dir' => $settings['default_theme_dir'] .'/PortaMx/SysCss/', 'url' => $settings['default_theme_url'] .'/PortaMx/SysCss/'));
 
 		$context['html_headers'] .= '
 		<link rel="stylesheet" type="text/css" href="'. $cssfile .'" />
@@ -108,7 +95,8 @@ function pmx_eclnonemodal()
 			function pmx_seteclcook(sName, sValue){
 			var expired = new Date();
 			expired.setTime(expired.getTime() + (30 * 24 * 60 * 60 * 1000));
-			document.cookie = sName +"="+ sValue +";expires="+ expired.toGMTString() +";path=/;";}
+			document.cookie = sName +"="+ sValue +";expires="+ expired.toGMTString() +";path=/;";
+			window.location.reload();}
 		// ]]></script>';
 
 		if(empty($maintenance))
@@ -146,6 +134,7 @@ function pmx_setECL_Cookie()
 	{
 		setcookie('ecl_auth', 1, time() + (30 * 24 * 60 * 60), '/');
 		$_COOKIE['ecl_auth'] = 1;
+		redirectexit();
 	}
 }
 

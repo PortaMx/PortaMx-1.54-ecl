@@ -5,8 +5,8 @@
 *
 * \author PortaMx - Portal Management Extension
 * \author Copyright 2008-2014 by PortaMx corp. - http://portamx.com
-* \version 1.52
-* \date 18.08.2014
+* \version 1.53
+* \date 14.11.2014
 */
 
 if(!defined('PortaMx'))
@@ -329,15 +329,15 @@ class PortaMxC_SystemAdminCategories extends PortaMxC_AdminCategories
 										<select style="float:'. $RtL .';margin-'. $RtL .':20px; width:45%;margin-top:3px;" name="artsort[]" id="pmxartsort" onchange="changed(\'pmxartsort\');" size="3" multiple="multiple">';
 
 		if(!empty($this->cfg['artsort']))
-    {
-      $sortdata = array();
+		{
+			$sortdata = array();
 			$sortval = Pmx_StrToArray($this->cfg['artsort']);
-      foreach($sortval as $sort)
-      {
-        @list($k, $v) = Pmx_StrToArray($sort, '=');
+			foreach($sortval as $sort)
+			{
+				@list($k, $v) = Pmx_StrToArray($sort, '=');
 					$sortdata[$k] = $v;
-      }
-    }
+			}
+		}
 		else
 			$sortdata = array('id' => 1);
 

@@ -5,8 +5,8 @@
 *
 * \author PortaMx - Portal Management Extension
 * \author Copyright 2008-2014 by PortaMx corp. - http://portamx.com
-* \version 1.52
-* \date 18.08.2014
+* \version 1.53
+* \date 14.11.2014
 */
 function template_eclnonemodal_above()
 {
@@ -36,7 +36,7 @@ function template_eclnonemodal_above()
 	echo '
 			'. $txt['pmxelc_needAccept'] .'
 		<div style="padding-top:5px;">
-			<input type="button" name="accept" value="'. $txt['pmxelc_button'] .'" title="'. $txt['pmxelc_button_ttl'] .'" onclick="pmx_seteclcook(\'ecl_auth\', 1);window.location.reload()" />&nbsp;
+			<input type="button" name="accept" value="'. $txt['pmxelc_button'] .'" title="'. $txt['pmxelc_button_ttl'] .'" onclick="pmx_seteclcook(\'ecl_auth\', 1);window.location.reload();" />&nbsp;
 			'. $txt['pmxelc_modal'] .'
 			<input style="float:right;" type="button" name="accept" value="'. $txt['pmxelc_privacy'] .'" title="'. $txt['pmxelc_privacy_ttl'] .'" onclick="pmx_showprivacy()" />
 		</div>

@@ -5,8 +5,8 @@
 *
 * \author PortaMx - Portal Management Extension
 * \author Copyright 2008-2014 by PortaMx corp. - http://portamx.com
-* \version 1.52
-* \date 18.08.2014
+* \version 1.53
+* \date 14.11.2014
 */
 
 if(!defined('PortaMx'))
@@ -58,7 +58,7 @@ class PortaMxC_SystemAdminArticle extends PortaMxC_AdminArticles
 	*/
 	function pmxc_ShowAdmArticleConfig()
 	{
-		global $context, $settings, $modSettings, $options, $user_info, $txt;
+		global $context, $settings, $boarddir, $modSettings, $options, $user_info, $txt;
 
 		// directions
 		$LtR = empty($context['right_to_left']) ? 'left' : 'right';
@@ -226,9 +226,24 @@ class PortaMxC_SystemAdminArticle extends PortaMxC_AdminArticles
 							<tr>
 								<td valign="top" colspan="2" style="padding:4px;">';
 
-		// show the wysiwyg editor
 		if($this->cfg['ctype'] == 'html')
-			PortaMx_EditContent_xhtml('content', $this->cfg['content']);
+		{
+			// show the editor
+			$allow = allowPmx('pmx_admin') || allowPmx('pmx_articles') || allowPmx('pmx_create');
+			$fnd = explode('/', str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT']));
+			$smfpath = str_replace('\\', '/', $boarddir);
+			foreach($fnd as $key => $val) { $fnd[$key] = $val; $rep[] = ''; }
+			$filepath = trim(str_replace($fnd, $rep, $smfpath), '/') .'/editor_uploads/images';
+			if(count($fnd) == count(explode('/', $smfpath)))
+				$filepath = '/'. $filepath;
+			$_SESSION['pmx_ckfm'] = array('ALLOW' => $allow, 'FILEPATH' => $filepath);
+
+			echo '
+							<textarea name="'. $context['pmx']['htmledit']['id'] .'">'. $context['pmx']['htmledit']['content'] .'</textarea>
+							<script language="JavaScript" type="text/javascript">
+								CKEDITOR.replace("'. $context['pmx']['htmledit']['id'] .'", {filebrowserBrowseUrl: "ckeditor/fileman/index.php"});
+							</script>';
+		}
 		else
 		{
 			if($this->cfg['ctype'] == 'bbc')

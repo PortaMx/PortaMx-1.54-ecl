@@ -5,8 +5,8 @@
 *
 * \author PortaMx - Portal Management Extension
 * \author Copyright 2008-2014 by PortaMx corp. - http://portamx.com
-* \version 1.52
-* \date 18.08.2014
+* \version 1.53
+* \date 14.11.2014
 */
 
 if(!defined('PortaMx'))
@@ -224,7 +224,7 @@ class pmxc_user_login extends PortaMxC_SystemBlock
 								// ]]></script>';
 
 		// show a language dropdown selector
-		if(!empty($this->cfg['config']['settings']['show_langsel']) && count($context['pmx']['languages']) > 1)
+		if(pmx_checkECL_Cookie() && !empty($this->cfg['config']['settings']['show_langsel']) && count($context['pmx']['languages']) > 1)
 		{
 			echo '
 								<hr />'. $txt['pmx_langsel'] .'

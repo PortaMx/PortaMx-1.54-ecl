@@ -5,8 +5,8 @@
 *
 * \author PortaMx - Portal Management Extension
 * \author Copyright 2008-2014 by PortaMx corp. - http://portamx.com
-* \version 1.52
-* \date 18.08.2014
+* \version 1.53
+* \date 14.11.2014
 */
 
 if(!defined('PortaMx'))
@@ -143,7 +143,7 @@ class pmxc_cbt_navigator extends PortaMxC_SystemBlock
 						if(!empty($bID))
 						{
 							$this->cat_board[$cID]['boards'][$bID]['topics'] = $topic;
-              $topic = array();
+							$topic = array();
 						}
 
 						// save the new board

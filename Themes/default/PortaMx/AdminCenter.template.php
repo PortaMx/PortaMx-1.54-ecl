@@ -5,8 +5,8 @@
 *
 * \author PortaMx - Portal Management Extension
 * \author Copyright 2008-2014 by PortaMx corp. - http://portamx.com
-* \version 1.52
-* \date 18.08.2014
+* \version 1.53
+* \date 14.11.2014
 */
 
 function template_main()
@@ -146,7 +146,7 @@ function template_main()
 										<div class="normaltext" style="padding:2px 3px;">';
 
 			if(!empty($context['pmx_info']['update']) && empty($context['pmx_info']['versionOK']))
-        echo '
+				echo '
 											<a href="'. $scripturl .'?action=admin;area=packages;sa=download;get;server='. $context['pmx_info']['updserver'] .';package='. $context['pmx']['server']['update'] . $context['pmx_info']['update'] .';'. $context['session_var'] .'='. $context['session_id'] .'">'. $txt['pmx_center_update'] .'</a>';
 
 			echo '

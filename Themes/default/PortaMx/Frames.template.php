@@ -5,8 +5,8 @@
 *
 * \author PortaMx - Portal Management Extension
 * \author Copyright 2008-2014 by PortaMx corp. - http://portamx.com
-* \version 1.52
-* \date 18.08.2014
+* \version 1.53
+* \date 14.11.2014
 */
 
 /**
@@ -330,7 +330,7 @@ function Pmx_Frame_top($cfg, $count)
 		oCookieOptions: {
 			bUseCookie: true,
 			sCookieName: \''. 'upshr'. $IDtype .'\',
-			sCookieValue: \''. $options['collapse'. $IDtype] .'\'
+			sCookieValue: \''. (!empty($options['collapse'. $IDtype]) ? $options['collapse'. $IDtype] : 0) .'\'
 		}
 	});';
 	}

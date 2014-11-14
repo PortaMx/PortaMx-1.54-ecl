@@ -5,8 +5,8 @@
 *
 * \author PortaMx - Portal Management Extension
 * \author Copyright 2008-2014 by PortaMx corp. - http://portamx.com
-* \version 1.52
-* \date 18.08.2014
+* \version 1.53
+* \date 14.11.2014
 */
 
 if(!defined('PortaMx'))
@@ -43,7 +43,7 @@ class pmxc_script extends PortaMxC_SystemBlock
 			}
 
 			// create find/replace array,
-      foreach($matches as $key => $phpevals)
+			foreach($matches as $key => $phpevals)
 			{
 				$phpcode[$key] = '\';' . "\n". trim($phpevals[3]) ."\n". 'echo \'';
 				$remove[$key] = $phpevals[0];

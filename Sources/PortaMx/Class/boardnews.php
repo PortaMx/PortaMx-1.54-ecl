@@ -5,8 +5,8 @@
 *
 * \author PortaMx - Portal Management Extension
 * \author Copyright 2008-2014 by PortaMx corp. - http://portamx.com
-* \version 1.52
-* \date 18.08.2014
+* \version 1.53
+* \date 14.11.2014
 */
 
 if(!defined('PortaMx'))
@@ -295,8 +295,8 @@ class pmxc_boardnews extends PortaMxC_SystemBlock
 			list($pid, $post) = each($this->posts);
 
 		// only one? .. clear split
-    if(count($this->posts) - $this->startpage == 1)
-      $this->is_Split = false;
+		if(count($this->posts) - $this->startpage == 1)
+			$this->is_Split = false;
 
 		// show the pageindex line
 		if(!empty($this->pageindex) && !empty($this->cfg['config']['settings']['pgidxtop']))

@@ -5,8 +5,8 @@
 *
 * \author PortaMx - Portal Management Extension
 * \author Copyright 2008-2014 by PortaMx corp. - http://portamx.com
-* \version 1.52
-* \date 18.08.2014
+* \version 1.53
+* \date 14.11.2014
 */
 
 if(!defined('SMF'))
@@ -20,7 +20,7 @@ function PortaMx($doinit = false)
 {
 	global $smcFunc, $pmxCacheFunc, $context, $settings, $db_character_set, $modSettings, $sourcedir, $boarddir, $boardurl, $txt, $mbname, $scripturl, $user_info, $maintenance;
 
-  // we can exit on this...
+	// we can exit on this...
 	if(defined('PortaMx') || (isset($_REQUEST['action']) && $_REQUEST['action'] == 'dlattach' && empty($doinit)))
 		return;
 
@@ -30,16 +30,40 @@ function PortaMx($doinit = false)
 	if(isset($_GET['pg']) && is_array($_GET['pg']))
 	{
 		$key = key($_GET['pg']);
-		pmx_setcookie('pgidx_'. $key, $_GET['pg'][$key]);
-		unset($_GET['pg']);
-		redirectexit(pmx_http_build_query($_GET));
+		if(!pmx_checkECL_Cookie())
+		{
+			$_POST['pg'] = $_GET['pg'];
+			unset($_GET['pg']);
+		}
+		else
+		{
+			pmx_setcookie('pgidx_'. $key, $_GET['pg'][$key]);
+			unset($_GET['pg']);
+			redirectexit(pmx_http_build_query($_GET));
+		}
 	}
 
 	// check if a language change requested
 	if(isset($_REQUEST['language']) && isset($_REQUEST['pmxrd']))
 	{
 		clean_cache();
+		// Allow the user to change their language if its valid.
+		if (!empty($modSettings['userLanguage']) && !empty($_GET['language']))
+		{
+			$user_info['language'] = strtr($_GET['language'], './\\:', '____');
+			$_SESSION['language'] = $user_info['language'];
+		}
 		redirectexit(base64_decode($_REQUEST['pmxrd']));
+	}
+
+	// check if a pmxscriptdebug change requested
+	if(isset($_GET['pmxscriptdebug']) && in_array($_GET['pmxscriptdebug'], array('on', 'off')))
+	{
+		if(allowPmx('pmx_admin'))
+			pmx_setcookie('pmxscriptdebug', ($_GET['pmxscriptdebug'] == 'on' ? 1 : ''));
+
+		unset($_GET['pmxscriptdebug']);
+		redirectexit(pmx_http_build_query($_GET));
 	}
 
 	// redirect on illegal request
@@ -69,7 +93,7 @@ function PortaMx($doinit = false)
 
 	// load common javascript
 	$context['html_headers'] .= '
-	<script language="JavaScript" type="text/javascript" src="'. $context['pmx_scripturl'] .'PortaMx.js'. $context['pmx_jsrel'] .'"></script>
+	<script language="JavaScript" type="text/javascript" src="'. PortaMx_loadCompressed('PortaMx.js') .'"></script>
 	<script language="JavaScript" type="text/javascript"><!-- // --><![CDATA[
 		var pmx_popup_rtl = '. (!empty($context['right_to_left']) ? 'true' : 'false') .';
 		var pmx_restore_top = '. (empty($context['pmx']['settings']['restoretop']) || !is_numeric($cook) ? '\'\'' : $cook) .';
@@ -82,7 +106,7 @@ function PortaMx($doinit = false)
 	{
 		// load the admin javascrip
 		$context['html_headers'] .= '
-	<script language="JavaScript" type="text/javascript" src="'. $context['pmx_scripturl'] .'PortaMxAdmin.js'. $context['pmx_jsrel'] .'"></script>';
+	<script language="JavaScript" type="text/javascript" src="'. PortaMx_loadCompressed('PortaMxAdmin.js') .'"></script>';
 
 		// admin languages
 		loadLanguage($context['pmx_templatedir'] .'Admin');
@@ -163,7 +187,7 @@ function PortaMx($doinit = false)
 	}
 
 	// check all the actions and more...
-  if(empty($context['pmx']['forumReq']))
+	if(empty($context['pmx']['forumReq']))
 	{
 		// if a redirect request, exit
 		$requrl = (strpos($_SERVER['REQUEST_URL'], substr($scripturl, 0, strrpos($scripturl, '/'))) === false ? $_SERVER['REQUEST_URL'] : $scripturl);
@@ -215,7 +239,7 @@ function PortaMx($doinit = false)
 		}
 	}
 
-  if(!empty($context['pmx']['forumReq']))
+	if(!empty($context['pmx']['forumReq']))
 	{
 		// get the action
 		$action = (isset($_REQUEST['action']) ? ($_REQUEST['action'] == 'collapse' ? 'community' : $_REQUEST['action']) : (isset($_REQUEST['board']) ? 'boards' : (isset($_REQUEST['topic']) ? 'topics' : '')));
@@ -238,7 +262,7 @@ function PortaMx($doinit = false)
 	loadTemplate($context['pmx_templatedir'] .'Frames');
 
 	// supress these links if ECL not accepted
-	if(!empty($rqaction) && !pmx_checkECL_Cookie() && in_array($rqaction, array('calendar', 'markasread', 'profile', 'search', 'stats', 'mlist', 'who')))
+	if(!empty($rqaction) && !pmx_checkECL_Cookie() && in_array($rqaction, array('calendar', 'markasread', 'profile', 'stats', 'mlist', 'who')))
 		pmx_ECL_Error('request');
 
 	// Create the linktree

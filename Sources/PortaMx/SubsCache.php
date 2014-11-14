@@ -5,8 +5,8 @@
 *
 * \author PortaMx - Portal Management Extension
 * \author Copyright 2008-2014 by PortaMx corp. - http://portamx.com
-* \version 1.52
-* \date 18.08.2014
+* \version 1.53
+* \date 14.11.2014
 */
 
 if(!defined('SMF'))
@@ -464,7 +464,7 @@ function get_milliseconds()
 	if(@version_compare(PHP_VERSION, '5.0.0') < 0)
 	{
 		list($usec, $sec) = explode(' ', microtime());
-    return ((float)$usec + (float)$sec);
+		return ((float)$usec + (float)$sec);
 	}
 	else
 		return microtime(true);

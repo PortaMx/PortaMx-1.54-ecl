@@ -116,4 +116,6 @@ if(!empty($_SESSION['pmx_ckfm']) && (is_array($_SESSION['pmx_ckfm']) && !empty($
 </body>
 <script>document.getElementById("bodydiv").style.height = (window.innerHeight-67)+"px";</script>
 </html>';
+else
+	echo 'Access denied';
 ?>

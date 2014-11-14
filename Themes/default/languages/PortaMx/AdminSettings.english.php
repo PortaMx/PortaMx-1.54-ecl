@@ -5,8 +5,8 @@
 *
 * \author PortaMx - Portal Management Extension
 * \author Copyright 2008-2014 by PortaMx corp. - http://portamx.com
-* \version 1.52
-* \date 18.08.2014
+* \version 1.53
+* \date 14.11.2014
 */
 
 // AdminSettings
@@ -151,18 +151,18 @@ RewriteRule ^(.*)$ index.php?q=$1 [L,QSA]';
 $txt['pmx_sef_engine_IScode'] = '<?xml version="1.0" encoding="UTF-8"?>
 <configuration>
  <system.webServer>
-  <rewrite>
-   <rules>
-    <rule name="PortaMxSEF">
-     <match url="^(.*)$" ignoreCase="false" />
-     <conditions logicalGrouping="MatchAll">
-      <add input="{REQUEST_FILENAME}" matchType="IsFile" negate="true" pattern="" ignoreCase="false" />
-      <add input="{REQUEST_FILENAME}" matchType="IsDirectory" negate="true" pattern="" ignoreCase="false" />
-     </conditions>
-     <action type="Rewrite" url="index.php?q={R:1}" appendQueryString="true" />
-    </rule>
-   </rules>
-  </rewrite>
+	<rewrite>
+	 <rules>
+		<rule name="PortaMxSEF">
+		 <match url="^(.*)$" ignoreCase="false" />
+		 <conditions logicalGrouping="MatchAll">
+			<add input="{REQUEST_FILENAME}" matchType="IsFile" negate="true" pattern="" ignoreCase="false" />
+			<add input="{REQUEST_FILENAME}" matchType="IsDirectory" negate="true" pattern="" ignoreCase="false" />
+		 </conditions>
+		 <action type="Rewrite" url="index.php?q={R:1}" appendQueryString="true" />
+		</rule>
+	 </rules>
+	</rewrite>
  </system.webServer>
 </configuration>';
 // END NO CHANGE

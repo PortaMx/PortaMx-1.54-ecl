@@ -5,16 +5,18 @@
 *
 * \author PortaMx - Portal Management Extension
 * \author Copyright 2008-2014 by PortaMx corp. - http://portamx.com
-* \version 1.52
-* \date 18.08.2014
+* \version 1.53
+* \date 14.11.2014
 */
 
 function template_main()
 {
 	global $context, $scripturl, $settings, $language, $cookiename, $txt;
 
+	$replaces = array('@host@' => $_SERVER['SERVER_NAME'], '@cookie@' => $cookiename, '@site@' => $context['forum_name']);
+
 	echo '
-		<div style="margin:0 auto; width:70%;">
+		<div style="margin:0 auto; width:'. (!empty($context['pmx_eclcheck']) ? '90%' : '70%;') .'">
 			<div class="cat_bar">
 				<h3 class="catbg"><span style="display:block;text-align:center;">'. $context['pmx_error_title'] .'</span></h3>
 			</div>
@@ -43,7 +45,7 @@ function template_main()
 		echo '
 						<div style="clear:both;padding:10px;text-align:center;line-height:1.5em;">
 							'. $context['pmx_error_text'] .'<br /><br />
-							<input class="button_submit" type="button" name="accept" value="'. $txt['pmxelc_button'] .'" title="'. $txt['pmxelc_button_ttl'] .'" onclick="pmx_seteclcook(\'ecl_auth\', 1);window.location.reload()" />&nbsp;
+							<input class="button_submit" type="button" name="accept" value="'. $txt['pmxelc_button'] .'" title="'. $txt['pmxelc_button_ttl'] .'" onclick="pmx_seteclcook(\'ecl_auth\', 1);window.location.href=smf_scripturl" />&nbsp;
 							<input class="button_submit" type="button" name="privacy" value="'. $txt['pmxelc_privacy'] .'" title="'. $txt['pmxelc_privacy_ttl'] .'" onclick="pmx_showprivacy()" />
 						</div>
 						<script language="JavaScript" type="text/javascript"><!-- // --><![CDATA[
@@ -58,8 +60,55 @@ function template_main()
 
 		$privacyfile = $settings['default_theme_dir'] .'/languages/PortaMx/ecl_privacynotice.'. $currlang .'.php';
 		if(file_exists($privacyfile))
+		{
+			include_once($privacyfile);
+
 			echo '
-							<div>'. str_replace('@host@', $_SERVER['SERVER_NAME'], str_replace('@cookie@', $cookiename, file_get_contents($privacyfile))) .'</div>';
+				<div id="ecl_privacytext">
+				'. strtr($txt['pmx_ecl_header'], $replaces) .'
+					<table cellspacing="0" cellpadding="0" width="100%" border="0">';
+
+			foreach($txt['pmx_ecl_headrows'] as $row => $ecltextrows)
+			{
+				echo '
+						<tr>';
+
+				foreach($ecltextrows as $nr => $ecltext)
+					echo '
+							<td valign="top"'. ($nr == 2 ? ' width="20%"' : '') . empty($row).'>'. (empty($row) ? '<u>' : '') . strtr($ecltext, $replaces) .(empty($row) ? '</u>' : '') .'</td>';
+
+				echo '
+						</tr>';
+			}
+
+			echo '
+					</table>
+					<br />';
+
+			echo '
+				'. $txt['pmx_ecl_footertop'] .'
+					<table cellspacing="0" cellpadding="0" width="100%" border="0">';
+
+			foreach($txt['pmx_ecl_footrows'] as $ecltextrows)
+			{
+				echo '
+						<tr>';
+
+				foreach($ecltextrows as $ecltext)
+					echo '
+							<td valign="top">'. $ecltext .'</td>';
+
+				echo '
+						</tr>';
+			}
+
+			echo '
+					</table>';
+
+			echo '
+				'. $txt['pmx_ecl_footer'] .'
+				</div>';
+		}
 		else
 			echo '
 							<div>'. $txt['pmxelc_privacy_failed'] .'</div>';

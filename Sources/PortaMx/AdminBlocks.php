@@ -6,8 +6,8 @@
 *
 * \author PortaMx - Portal Management Extension
 * \author Copyright 2008-2014 by PortaMx corp. - http://portamx.com
-* \version 1.52
-* \date 18.08.2014
+* \version 1.53
+* \date 14.11.2014
 */
 
 if(!defined('PortaMx'))
@@ -235,7 +235,7 @@ function PortaMx_AdminBlocks()
 					{
 						$id = $_POST['edit_block'];
 						$context['pmx']['function'] = 'edit';
-            $block = null;
+						$block = null;
 					}
 
 					// move block, clone block
@@ -575,7 +575,7 @@ function PortaMx_AdminBlocks()
 				}
 
 				$context['html_headers'] .= '
-	<script type="text/javascript" src="'. $context['pmx_scripturl'] .'PortaMxPopup.js'. $context['pmx_jsrel'] .'"></script>';
+	<script type="text/javascript" src="'. PortaMx_loadCompressed('PortaMxPopup.js') .'"></script>';
 			}
 
 			elseif(empty($_POST['save_edit']))

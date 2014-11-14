@@ -2,10 +2,10 @@
 <!DOCTYPE package-info SYSTEM "http://www.simplemachines.org/xml/package-info">
 <package-info xmlns="http://www.simplemachines.org/xml/package-info" xmlns:smf="http://www.simplemachines.org/">
 
-	<name>PortaMx 1.52 ecl</name>
+	<name>PortaMx 1.53 ecl</name>
 	<id>portamx_corp:PortaMx</id>
 	<type>modification</type>
-	<version>1.52</version>
+	<version>1.53</version>
 
 	<install for="2.0*">
 		<readme type="file" parsebbc="true">install/readme.bbc</readme>
@@ -16,10 +16,9 @@
 		<require-dir name="Themes/default/highslide" destination="$themedir" />
 		<require-dir name="Themes/default/languages/PortaMx" destination="$languagedir" />
 		<require-dir name="Smileys/PortaMx" destination="$smileysdir" />
-		<require-dir name="fckeditor" destination="$boarddir" />
+		<require-dir name="ckeditor" destination="$boarddir" />
 		<require-dir name="editor_uploads" destination="$boarddir" />
 		<require-file name="Themes/default/css/pmx_frontpage.css" destination="$themedir/css" />
-		<require-file name="Themes/core/css/pmx_frontpage.css" destination="$boarddir/Themes/core/css" />
 		<require-file name="admin_images/pmx_adm_articles.gif" destination="$imagesdir/admin" />
 		<require-file name="admin_images/pmx_adm_blocks.gif" destination="$imagesdir/admin" />
 		<require-file name="admin_images/pmx_adm_categories.gif" destination="$imagesdir/admin" />
@@ -30,36 +29,27 @@
 		<redirect url="$scripturl?action=admin;area=pmx_center" timeout="60000">install/installdone.html</redirect>
 	</install>
 
-	<upgrade from="1.51" for="2.0*">
+	<upgrade from="1.52" for="2.0*">
 		<readme type="file" parsebbc="true">install/readme.bbc</readme>
 		<database type="file">install/dbinstall.php</database>
+		<modification format="xml" type="file">install/update152.xml</modification>
+		<remove-dir name="$boarddir/fckeditor" />
+		<remove-dir name="Themes/default/PortaMx" />
 		<require-dir name="Sources/PortaMx" destination="$sourcedir" />
 		<require-dir name="Themes/default/PortaMx" destination="$themedir" />
+		<require-dir name="Themes/default/highslide" destination="$themedir" />
 		<require-dir name="Themes/default/languages/PortaMx" destination="$languagedir" />
-		<redirect url="$scripturl?action=admin;area=pmx_center" timeout="60000">install/installdone.html</redirect>
-	</upgrade>
-
-	<upgrade from="1.5" for="2.0*">
-		<readme type="file" parsebbc="true">install/readme.bbc</readme>
-		<database type="file">install/dbinstall.php</database>
-		<require-dir name="Sources/PortaMx" destination="$sourcedir" />
-		<require-dir name="Themes/default/PortaMx" destination="$themedir" />
-		<require-dir name="Themes/default/languages/PortaMx" destination="$languagedir" />
+		<require-dir name="Smileys/PortaMx" destination="$smileysdir" />
+		<require-dir name="ckeditor" destination="$boarddir" />
+		<require-dir name="editor_uploads" destination="$boarddir" />
 		<require-file name="Themes/default/css/pmx_frontpage.css" destination="$themedir/css" />
-		<require-file name="Themes/core/css/pmx_frontpage.css" destination="$boarddir/Themes/core/css" />
-		<redirect url="$scripturl?action=admin;area=pmx_center" timeout="60000">install/installdone.html</redirect>
-	</upgrade>
-
-	<upgrade from="1.4,1.41,1.45" for="2.0*">
-		<readme type="file" parsebbc="true">install/readme.bbc</readme>
-		<database type="file">install/dbinstall.php</database>
-		<modification format="xml" type="file">install/pmxupd14x.xml</modification>
-		<remove-file name="Sources/PortaMx/Compat.php" />
-		<require-dir name="Sources/PortaMx" destination="$sourcedir" />
-		<require-dir name="Themes/default/PortaMx" destination="$themedir" />
-		<require-dir name="Themes/default/languages/PortaMx" destination="$languagedir" />
-		<require-file name="Themes/default/css/pmx_frontpage.css" destination="$themedir/css" />
-		<require-file name="Themes/core/css/pmx_frontpage.css" destination="$boarddir/Themes/core/css" />
+		<require-file name="admin_images/pmx_adm_articles.gif" destination="$imagesdir/admin" />
+		<require-file name="admin_images/pmx_adm_blocks.gif" destination="$imagesdir/admin" />
+		<require-file name="admin_images/pmx_adm_categories.gif" destination="$imagesdir/admin" />
+		<require-file name="admin_images/pmx_adm_center.gif" destination="$imagesdir/admin" />
+		<require-file name="admin_images/pmx_adm_sef.gif" destination="$imagesdir/admin" />
+		<require-file name="admin_images/pmx_adm_languages.gif" destination="$imagesdir/admin" />
+		<require-file name="admin_images/pmx_adm_settings.gif" destination="$imagesdir/admin" />
 		<redirect url="$scripturl?action=admin;area=pmx_center" timeout="60000">install/installdone.html</redirect>
 	</upgrade>
 
@@ -72,8 +62,7 @@
 		<remove-dir name="$themedir/highslide" />
 		<remove-dir name="$languagedir/PortaMx" />
 		<remove-dir name="$smileysdir/PortaMx" />
-		<remove-dir name="$boarddir/fckeditor" />
-		<remove-file name="$boarddir/Themes/core/css/pmx_frontpage.css" />
+		<remove-dir name="$boarddir/ckeditor" />
 		<remove-file name="$themedir/css/pmx_frontpage.css" />
 		<remove-file name="$imagesdir/admin/pmx_adm_articles.gif" />
 		<remove-file name="$imagesdir/admin/pmx_adm_blocks.gif" />

@@ -6,8 +6,8 @@
 *
 * \author PortaMx - Portal Management Extension
 * \author Copyright 2008-2014 by PortaMx corp. - http://portamx.com
-* \version 1.52
-* \date 18.08.2014
+* \version 1.53
+* \date 14.11.2014
 */
 
 if(!defined('PortaMx'))
@@ -351,7 +351,7 @@ function PortaMx_AdminSettings()
 			}
 		}
 
- 		// Load data for the other settings
+		// Load data for the other settings
 		else
 		{
 			$context['pmx']['admthemes'] = PortaMx_getsmfThemes();

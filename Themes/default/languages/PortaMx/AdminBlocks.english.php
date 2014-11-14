@@ -5,8 +5,8 @@
 *
 * \author PortaMx - Portal Management Extension
 * \author Copyright 2008-2014 by PortaMx corp. - http://portamx.com
-* \version 1.52
-* \date 18.08.2014
+* \version 1.53
+* \date 14.11.2014
 */
 
 // Block description
@@ -184,12 +184,12 @@ $txt['pmx_fader_content_help'] = 'You can use any html code in the fader.
 	<b>Examples</b>:';
 // do not reformat these !
 $txt['pmx_fader_content_help1'] = '{A simple text<br />
-  break in two lines.}
+	break in two lines.}
 {
-  <img src="url.tld/path/imagename.png" />
+	<img src="url.tld/path/imagename.png" />
 }
 { <a href="url.tld" target="_blank">
-   This is a link
+	 This is a link
 </a> }=(1.5,1.5,4.0)';
 
 // polls

@@ -5,8 +5,8 @@
 *
 * \author PortaMx - Portal Management Extension
 * \author Copyright 2008-2014 by PortaMx corp. - http://portamx.com
-* \version 1.52
-* \date 18.08.2014
+* \version 1.53
+* \date 14.11.2014
 */
 
 /**
@@ -393,7 +393,7 @@ function template_main()
 				'. pmx_popupHeader($txt['pmx_category_popup']) .'
 					<select id="pWind.cats.sel" onchange="pmxChgCats(this)" style="width:100%;" size="6" name="">';
 
-      $selcats = array_merge(array(PortaMx_getDefaultCategory($txt['pmx_categories_none'])), $categories);
+			$selcats = array_merge(array(PortaMx_getDefaultCategory($txt['pmx_categories_none'])), $categories);
 			$ordercats = array_merge(array(0), $context['pmx']['catorder']);
 			$isWriter = allowPmx('pmx_create, pmx_articles', true);
 			$isAdm = allowPmx('pmx_admin');
@@ -403,14 +403,14 @@ function template_main()
 				$cat = PortaMx_getCatByOrder($selcats, $catorder);
 				$cfg = unserialize($cat['config']);
 				if(!empty($isAdm) || (!empty($isWriter) && empty($cfg['global'])))
-        {
+				{
 				  $details = PortaMx_getCatDetails($cat, $selcats);
 				  $details['parent'] .= $txt['pmx_chg_articlcats'];
 				  $catdetais[] = $cat['id'] .'|'. $details['level'] .'|'. $details['parent'] .'|'. $details['class'] .'|'. $cat['name'];
 
 				  echo '
 						<option value="'. $cat['id'] .'">'. str_repeat('&bull;', $cat['level']) .' '. $cat['name'] .'</option>';
-        }
+				}
 			}
 
 			echo '
@@ -602,7 +602,7 @@ function PmxArticleOverview($article, &$cfg_titleicons, &$cfg_smfgroups, $catego
 	echo '
 								<td id="pmxSetCats.'. $article['id'] .'" valign="middle" style="padding:3px 5px;">';
 
-  $cat = PortaMx_getCatByID($categories, $article['catid']);
+	$cat = PortaMx_getCatByID($categories, $article['catid']);
 	$details = PortaMx_getCatDetails($cat, $categories);
 	if(empty($cat))
 	{

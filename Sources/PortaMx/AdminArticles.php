@@ -6,8 +6,8 @@
 *
 * \author PortaMx - Portal Management Extension
 * \author Copyright 2008-2014 by PortaMx corp. - http://portamx.com
-* \version 1.52
-* \date 18.08.2014
+* \version 1.53
+* \date 14.11.2014
 */
 
 if(!defined('PortaMx'))
@@ -86,9 +86,9 @@ function PortaMx_AdminArticles()
 
 						elseif($toID > $fromID) // to > from - move to after from
 							$query = array(
-                'SET id = id + 1 WHERE id >= '. $toID,
+								'SET id = id + 1 WHERE id >= '. $toID,
 								'SET id = '. $toID .' WHERE id = '. $fromID,
-                'SET id = id - 1 WHERE id >= '. $fromID,
+								'SET id = id - 1 WHERE id >= '. $fromID,
 							);
 
 						else // to < from - move to before from
@@ -100,10 +100,10 @@ function PortaMx_AdminArticles()
 
 						// execute
 						foreach($query as $qdata)
-            {
-              $x=1;
+						{
+							$x=1;
 							$smcFunc['db_query']('', 'UPDATE {db_prefix}portamx_articles '. $qdata, array());
-            }
+						}
 					}
 
 					// updates from overview popups ?
@@ -816,13 +816,12 @@ function PortaMx_AdminArticles()
 					}
 				}
 				$context['html_headers'] .= '
-	<script type="text/javascript" src="'. $context['pmx_scripturl'] .'PortaMxPopup.js'. $context['pmx_jsrel'] .'"></script>';
+	<script type="text/javascript" src="'. PortaMx_loadCompressed('PortaMxPopup.js') .'"></script>';
 			}
 			elseif(empty($_POST['save_edit']))
 			{
 				// prepare the editor
-				if($article['ctype'] != 'html')
-					PortaMx_EditArticle($article['ctype'], 'content', $article['content']);
+				PortaMx_EditArticle($article['ctype'], 'content', $article['content']);
 
 				// load the class file and create the object
 				require_once($context['pmx_sysclassdir']. 'PortaMx_AdminArticlesClass.php');

@@ -31,7 +31,7 @@ function getFilesNumber($path, $type){
   $dirs = 0;
   $tmp = listDirectory($path);
   foreach ($tmp as $ff){
-    if($ff == '.' || $ff == '..' || $ff = 'index.php')
+    if($ff == '.' || $ff == '..' || $ff == 'index.php')
       continue;
     elseif(is_file($path.'/'.$ff) && ($type == '' || ($type == 'image' && RoxyFile::IsImage($ff)) || ($type == 'flash' && RoxyFile::IsFlash($ff))))
       $files++;

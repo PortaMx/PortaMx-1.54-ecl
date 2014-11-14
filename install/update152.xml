@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="xslt/modification.xsl" type="text/xsl"?>
+<!DOCTYPE modification SYSTEM "http://www.simplemachines.org/xml/modification">
+
+<modification xmlns="http://www.simplemachines.org/xml/modification" xmlns:smf="http://www.simplemachines.org/">
+	<id>portamx_corp:PortaMx</id>
+	<version>1.53<version>
+
+<!-- Security.php -->
+	<file name="$sourcedir/Security.php">
+
+		<operation>
+			<search position="replace"><![CDATA[
+function is_not_guest($message = '')
+{
+	global $user_info, $txt, $context, $scripturl;
+]]></search>
+			<add><![CDATA[
+function is_not_guest($message = '')
+{
+	global $user_info, $txt, $context, $scripturl, $modSettings;
+]]></add>
+		</operation>
+
+		<operation>
+			<search position="replace"><![CDATA[
+	if(!pmx_checkECL_Cookie())
+		return;
+]]></search>
+			<add><![CDATA[
+	if(!pmx_checkECL_Cookie())
+	{
+		// Init  PortaMx if not loaded
+		if(empty($modSettings['pmxportal_disabled']) && !defined('PortaMx'))
+			PortaMx();
+
+		return pmx_ECL_Error('access');
+	}
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[
+		loadTemplate('Login');
+		$context['sub_template'] = 'kick_guest';
+		$context['robot_no_index'] = true;
+
+		// Init  PortaMx if not loaded
+		if(empty($modSettings['pmxportal_disabled']) && !defined('PortaMx'))
+			PortaMx(true);
+]]></search>
+			<add><![CDATA[
+		// Init  PortaMx if not loaded
+		if(empty($modSettings['pmxportal_disabled']) && !defined('PortaMx'))
+			PortaMx();
+
+		if(!pmx_checkECL_Cookie())
+			return pmx_ECL_Error('login');
+
+		loadTemplate('Login');
+		$context['sub_template'] = 'kick_guest';
+		$context['robot_no_index'] = true;
+]]></add>
+		</operation>
+	</file>
+</modification>

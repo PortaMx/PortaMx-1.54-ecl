@@ -6,8 +6,8 @@
 *
 * \author PortaMx - Portal Management Extension
 * \author Copyright 2008-2014 by PortaMx corp. - http://portamx.com
-* \version 1.52
-* \date 18.08.2014
+* \version 1.53
+* \date 14.11.2014
 */
 
 if(!defined('PortaMx'))
@@ -363,7 +363,7 @@ function PortaMx_AdminCategories()
 
 			// load popup js for overview
 			$context['html_headers'] .= '
-	<script type="text/javascript" src="'. $context['pmx_scripturl'] .'PortaMxPopup.js'. $context['pmx_jsrel'] .'"></script>';
+	<script type="text/javascript" src="'. PortaMx_loadCompressed('PortaMxPopup.js') .'"></script>';
 		}
 		elseif(empty($_POST['save_edit']))
 		{
@@ -414,13 +414,13 @@ function clearCachedBlocks()
 **/
 function pmx_move_cat($id, $place, $toid)
 {
-  global $smcFunc;
+	global $smcFunc;
 
 	// first delete from cat
 	$allcats = PortaMx_getCategories();
 	$movecat = PortaMx_getCatByID($allcats, $id);
 	unset($movecat['childs']);
-  unset($movecat['artsum']);
+	unset($movecat['artsum']);
 	pmx_delete_cat($id);
 
 	// now insert at place

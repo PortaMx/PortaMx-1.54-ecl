@@ -5,8 +5,8 @@
 *
 * \author PortaMx - Portal Management Extension
 * \author Copyright 2008-2014 by PortaMx corp. - http://portamx.com
-* \version 1.52
-* \date 18.08.2014
+* \version 1.53
+* \date 14.11.2014
 */
 
 if(!defined('PortaMx'))
@@ -113,7 +113,10 @@ function PortaMx_AdminCenter()
 								while(($file = readdir($dh)) !== false)
 								{
 									if(is_file($base . $dir . $file))
-										$files[] = $file;
+									{
+										if(strpos($file, '.min.') === false)
+											$files[] = $file;
+									}
 								}
 								closedir($dh);
 							}
@@ -508,7 +511,7 @@ function AdmCenterLangDelete($langId)
 	$removeSet = getInstalledLanguages($langId);
 
 	// do not remove files an a manually installed language
-  if(empty($removeSet['manually']))
+	if(empty($removeSet['manually']))
 	{
 		$removeSet = array_merge($removeSet, array('subdir' => '/Blocks'));
 		$themePaths = array(

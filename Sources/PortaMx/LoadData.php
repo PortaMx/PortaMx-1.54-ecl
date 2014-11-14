@@ -5,8 +5,8 @@
 *
 * \author PortaMx - Portal Management Extension
 * \author Copyright 2008-2014 by PortaMx corp. - http://portamx.com
-* \version 1.52
-* \date 18.08.2014
+* \version 1.53
+* \date 14.11.2014
 */
 
 if(!defined('SMF'))
@@ -220,7 +220,7 @@ function ParseXmlurl($feedurl, $resposetime, $headerstart = '<?xml')
 
 	// open the socket
 	$handle = fsockopen($host[1], 80, $eNbr, $eStr, intval($resposetime));
-  if($handle === false)
+	if($handle === false)
 	{
 		log_error(sprintf($txt['feed_response_error'], $feedurl, $resposetime));
 		$context['pmx']['feed_error_text'] = $eStr;
@@ -268,7 +268,7 @@ function ParseXmlurl($feedurl, $resposetime, $headerstart = '<?xml')
 	unset($head);
 
 	// check header if OK and/or chunked transfer
-  $httpResposes = array('http/1.0 100 ok', 'http/1.1 100 ok', 'http/1.0 200 ok', 'http/1.1 200 ok');
+	$httpResposes = array('http/1.0 100 ok', 'http/1.1 100 ok', 'http/1.0 200 ok', 'http/1.1 200 ok');
 	$ischunked = (in_array('transfer-encoding: chunked', $headers));
 	if(in_array($headers[0], $httpResposes))
 	{
@@ -286,7 +286,7 @@ function ParseXmlurl($feedurl, $resposetime, $headerstart = '<?xml')
 	else
 	{
 		$context['pmx']['feed_error_text'] = trim($headers[0]);
-    return '';
+		return '';
 	}
 }
 
@@ -671,7 +671,7 @@ function PortaMx_getCustomCssDefs()
 */
 function PortaMx_getCssDefs(&$css)
 {
-  global $settings;
+	global $settings;
 
 	// make array from def xml
 	$result = array();
@@ -775,13 +775,80 @@ function PortaMx_loadCustomCss($cssfile, $addheader = false)
 }
 
 /**
+* compress ccs data
+*/
+function PortaMx_compressCSS($cssdata)
+{
+	static $fnd = array('~/\*[^*]*\*+([^/][^*]*\*+)*/~', '~[\n\r]+~m', '~[\s\t]+~m', '~[\s]+\{~m', '~\{[\s]+~m', '~[\s]+\}~m', '~\}[\s]+~m', '~[\s]+\(~m', '~\([\s]+~m', '~[\s]+\)~m', '~\)[\s]+~m', '~[\s]+\,~m', '~\,[\s]+~m', '~[\s]+\:~m', '~\:[\s]+~m', '~[\s]+\;~m', '~\;[\s]+~m', '~\}~m', '~\}\n\}\n~m', '~\}\nto\{~m');
+	static $repl = array('', '', ' ', '{', '{', '}', '}', ' (', '(', ')', ') ', ',', ',', ':', ':', ';', ';', "}\n\t\t", "}}\n\t\t", "}to{");
+
+	return trim(preg_replace($fnd, $repl, $cssdata));
+}
+
+function PortaMx_compressJS($data)
+{
+	global $context;
+
+	if(file_exists($context['pmx_sourcedir'] .'Compress.php'))
+	{
+		require_once($context['pmx_sourcedir'] .'Compress.php');
+		return JSMin::minify($data);
+	}
+	else
+		return $data;
+}
+
+/**
+* load compressed Javascript or CSS
+*/
+function PortaMx_loadCompressed($file, $path = array())
+{
+	global $context;
+
+	// create compressed Name
+	$ext = substr($file, strrpos($file, '.'));
+	$minfile = str_replace($ext, '', $file) .'.min'. $ext;
+
+	// path not given, use defaults
+	if(empty($path))
+	{
+		$path['dir'] = ($ext == '.js' ? $context['pmx_scriptdir'] : $context['pmx_syscssdir']);
+		$path['url'] = ($ext == '.js' ? $context['pmx_scripturl'] : $context['pmx_syscssurl']);
+	}
+
+	// we have a debug cookie?
+	$cook = pmx_getcookie('pmxscriptdebug');
+
+	// get filetime
+	$filetime = filemtime($path['dir'] . $file);
+
+	// get filetime
+	$mintime = (file_exists($path['dir'] . $minfile) ? filemtime($path['dir'] . $minfile) : 0);
+
+	// minimized file not exist or older, create new
+	if($mintime != $filetime)
+	{
+		if($ext == '.js')
+			$data = PortaMx_compressJS(file_get_contents($path['dir'] . $file));
+		else
+			$data = str_replace("\n\t\t", "\n", PortaMx_compressCSS(file_get_contents($path['dir'] . $file)));
+
+		// save minimized file and set time
+		pmx_file_put_contents($path['dir'] . $minfile, $data);
+		@touch($path['dir'] . $minfile, $filetime);
+	}
+
+	return $path['url'] . (empty($cook) ? $minfile : $file) .'?'. $filetime;
+}
+
+/**
 * read the settings from database.
 */
 function PortaMx_getSettings($from_eclinit = false)
 {
 	global $smcFunc, $context, $boarddir, $sourcedir, $options, $forum_version, $settings, $modSettings, $user_info, $language, $pmxCacheFunc, $txt, $sc;
 
-	if(($buffer = $pmxCacheFunc['get']('settings', false)) !== null)
+	if(empty($from_eclinit) && ($buffer = $pmxCacheFunc['get']('settings', false)) !== null)
 		@list(
 			$context['pmx']['settings'],
 			$context['pmx']['pmxsys'],
@@ -835,7 +902,8 @@ function PortaMx_getSettings($from_eclinit = false)
 			$context['pmx']['languages'],
 			$context['pmx']['extracmd']
 		);
-		$pmxCacheFunc['put']('settings', $buffer, $context['pmx']['cache']['default']['settings_time'], false);
+		if(empty($from_eclinit))
+			$pmxCacheFunc['put']('settings', $buffer, $context['pmx']['cache']['default']['settings_time'], false);
 	}
 
 	// setup dirs
@@ -846,6 +914,7 @@ function PortaMx_getSettings($from_eclinit = false)
 	$context['pmx_customcssdir'] = $settings['default_theme_dir'] .'/PortaMx/BlockCss/';
 	$context['pmx_syscssdir'] = $settings['default_theme_dir'] .'/PortaMx/SysCss/';
 	$context['pmx_languagedir'] = $settings['default_theme_dir'] .'/languages/PortaMx/';
+	$context['pmx_scriptdir'] = $settings['default_theme_dir'] .'/PortaMx/Scripts/';
 
 	// setup urls
 	$context['pmx_imageurl'] = $settings['default_theme_url'] .'/PortaMx/SysCss/Images/';
@@ -1041,7 +1110,7 @@ function initBlockObject(&$handle)
 	$visible = is_object($handle);
 	if($visible)
 		$visible = (bool) $handle->pmxc_InitContent();
-  return $visible;
+	return $visible;
 }
 
 /**
@@ -1311,7 +1380,7 @@ function find_cat_insert_pos(&$cats, $cat, $id)
 		elseif(isset($data['childs']) && is_array($data['childs']))
 			$fnd = find_cat_insert_pos($cats[$ofs]['childs'], $cat, $id);
 	}
-  return $fnd;
+	return $fnd;
 }
 
 function PortaMx_getCategories($getart = false)
@@ -1319,7 +1388,7 @@ function PortaMx_getCategories($getart = false)
 	global $context, $smcFunc;
 
 	$context['pmx']['catorder'] = array();
-  $result = array();
+	$result = array();
 	$articles = array();
 
 	if(!empty($getart))
@@ -1597,7 +1666,7 @@ function PortaMx_ShowBlocks($side, $spacer = 0, $placement = '')
 	global $context, $txt, $scripturl;
 
 	$placed = 0;
-  $pages = array();
+	$pages = array();
 	$count = isset($context['pmx']['viewblocks'][$side]) ? count($context['pmx']['viewblocks'][$side]) : 0;
 	if($count > 0)
 	{
@@ -2104,7 +2173,7 @@ function PortaMx_ArticleSort($articles, $sortData)
 */
 function PortaMx_revoveLinks($content, $unlinkhref = false, $unlinkimg = false)
 {
-  global $modSettings, $txt;
+	global $modSettings, $txt;
 
 	// remove links
 	if($unlinkhref)
@@ -2389,18 +2458,8 @@ function PortaMx_PHPsyntax($data)
 {
 	global $context, $boarddir;
 
-	// get php version
-	@exec('php -v', $vers, $state);
-	if($state != 0)
-		$context['xmlpmx'] = '<b>Error: '. $state .' - PHP CLI not found.</b>';
-
-	// init return result
-	do {
-		list($d, $line) = each($vers);
-	} while(empty($line));
-
-	$context['xmlpmx'] = $line;
-	$context['xmlpmx'] .= '<img onclick="Hide_SyntaxCheck(this.parentNode)" style="padding-left:10px;cursor:pointer;" alt="close" src="'. $context['pmx_imageurl'] .'cross.png" class="pmxright" /><hr class="pmx_hr" />';
+	$line = '';
+	$context['xmlpmx'] .= '<img onclick="Hide_SyntaxCheck(this.parentNode)" style="padding-left:10px;cursor:pointer;" alt="close" src="'. $context['pmx_imageurl'] .'cross.png" class="pmxright" />';
 
 	// call the syntaxCheck
 	$result = php_syntax_error($data);
@@ -2708,7 +2767,7 @@ function PortaMx_headers($action = '')
 	if(empty($context['pmx']['settings']['disableHS']))
 	{
 		$context['html_headers'] .= '
-	<link rel="stylesheet" type="text/css" href="'. $settings['default_theme_url'] .'/highslide/highslide.css'. $context['pmx_jsrel'] .'" />
+	<link rel="stylesheet" type="text/css" href="'. PortaMx_loadCompressed('highslide.css', array('dir' => $settings['default_theme_dir'] .'/highslide/', 'url' => $settings['default_theme_url'] .'/highslide/')) .'" />
 	<script type="text/javascript" src="'. $settings['default_theme_url'] .'/highslide/highslide-full.packed.js"></script>
 	<script language="JavaScript" type="text/javascript"><!-- // --><![CDATA[
 		hs.graphicsDir = "'. $settings['default_theme_url'] .'/highslide/graphics/";
@@ -2728,11 +2787,11 @@ function PortaMx_headers($action = '')
 
 		if(!empty($context['right_to_left']))
 			$context['html_headers'] .= '
-	<link rel="stylesheet" type="text/css" href="'. $settings['default_theme_url'] .'/highslide/highslide_rtl.css'. $context['pmx_jsrel'] .'" />';
+	<link rel="stylesheet" type="text/css" href="'. PortaMx_loadCompressed('highslide_rtl.css', array('dir' => $settings['default_theme_dir'] .'/highslide/', 'url' => $settings['default_theme_url'] .'/highslide/')) .'" />';
 	}
 
 	$context['html_headers'] .= '
-	<link rel="stylesheet" type="text/css" href="'. $context['pmx_syscssurl'] .'portamx.css'. $context['pmx_jsrel'] .'" />
+	<link rel="stylesheet" type="text/css" href="'. PortaMx_loadCompressed('portamx.css') .'" />
 	<script language="JavaScript" type="text/javascript"><!-- // --><![CDATA[
 		function pmx_setCookie(sName, sValue){return pmxXMLrequest("action=xmlhttp;pmxcook=setcookie;xml", "var="+ sName +"&val="+ encodeURIComponent(sValue) +"&'. $context['session_var'] .'=' .$context['session_id'] .'");}
 		function pmx_getCookie(sName){return pmxXMLrequest("action=xmlhttp;pmxcook=getcookie;xml;name="+ sName);}
@@ -2740,7 +2799,7 @@ function PortaMx_headers($action = '')
 
 	if(!empty($context['right_to_left']))
 		$context['html_headers'] .= '
-	<link rel="stylesheet" type="text/css" href="'. $context['pmx_syscssurl'] .'portamx_rtl.css'. $context['pmx_jsrel'] .'" />';
+	<link rel="stylesheet" type="text/css" href="'. PortaMx_loadCompressed('portamx_rtl.css') .'" />';
 
 		// load additional css file on a fullsize frontpage
 	if($action == 'frontpage' && $context['pmx']['settings']['frontpage'] == 'fullsize' && file_exists($settings['theme_dir'] .'/css/pmx_frontpage.css'))

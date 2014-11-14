@@ -5,8 +5,8 @@
 *
 * \author PortaMx - Portal Management Extension
 * \author Copyright 2008-2014 by PortaMx corp. - http://portamx.com
-* \version 1.52
-* \date 18.08.2014
+* \version 1.53
+* \date 14.11.2014
 */
 
 if(!defined('PortaMx'))
@@ -346,7 +346,7 @@ class pmxc_polls extends PortaMxC_SystemBlock
 					$tablen = ($tablen < $bar ? $bar : $tablen);
 					$this->polls['options'][$i] = array(
 						'id' => 'options'. $this->cfg['id'] .'-' . $i,
-						'percent' => $bar,
+						'percent' => round((($option[1] * 100) / $divisor), 0),
 						'votes' => $option[1],
 						'option' => parse_bbc($option[0]),
 						'vote_button' => '<input type="'. ($row['max_votes'] > 1 ? 'checkbox' : 'radio') .'" name="options[]" id="options'. $this->cfg['id'] .'-'. $i .'" value="'. $i .'" class="'. ($row['max_votes'] > 1 ? 'input_check' : 'input_radio') .'" />'
