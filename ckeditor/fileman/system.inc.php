@@ -20,14 +20,19 @@
 
 	Contact: Lyubomir Arsov, liubo (at) web-lobby.com
 */
-error_reporting(E_ALL);
-ini_set('display_errors', 'on');
+error_reporting(0);
+ini_set('display_errors', 'off');
 // You DON'T have to make any changes to this file. For Roxy Fileman user configuration see conf.json file.
 define('BASE_PATH', dirname (__FILE__));
 date_default_timezone_set('UTC');
 if(!defined('FILEPATH'))
 {
-	include_once(dirname(__FILE__) .'/php/system_smf.php');
+	session_start();
+	if(empty($_SESSION))
+	{
+		@session_destroy();
+		include_once(dirname(__FILE__) .'/php/system_smf.php');
+	}
 	define('FILEPATH', $_SESSION['pmx_ckfm']['FILEPATH']);
 }
 ?>

@@ -94,7 +94,12 @@ function getFilesPath(){
 		return FILEPATH;
 	elseif(empty($_SESSION['pmx_ckfm']))
 	{
-		include_once('system_smf.php');
+		session_start();
+		if(empty($_SESSION))
+		{
+			@session_destroy();
+			include_once(realpath('system_smf.php'));
+		}
 		define('FILEPATH', $_SESSION['pmx_ckfm']['FILEPATH']);
 		return FILEPATH;
 	}

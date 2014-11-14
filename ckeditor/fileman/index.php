@@ -1,5 +1,11 @@
 <?php
-include_once(realpath('./php/system_smf.php'));
+session_start();
+if(empty($_SESSION))
+{
+	@session_destroy();
+	include_once(realpath('./php/system_smf.php'));
+}
+define('FILEPATH', $_SESSION['pmx_ckfm']['FILEPATH']);
 if(!empty($_SESSION['pmx_ckfm']) && (is_array($_SESSION['pmx_ckfm']) && !empty($_SESSION['pmx_ckfm']['ALLOW']) && !empty($_SESSION['pmx_ckfm']['FILEPATH'])))
 	echo '<!DOCTYPE html>
 <html>
