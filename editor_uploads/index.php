@@ -5,7 +5,7 @@
 *
 * \author PortaMx - Portal Management Extension
 * \author Copyright 2008-2015 by PortaMx corp. - http://portamx.com
-* \version 1.53
+* \version 1.54
 * \date 18.11.2015
 */
 

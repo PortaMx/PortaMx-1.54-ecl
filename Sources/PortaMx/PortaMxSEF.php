@@ -27,7 +27,7 @@
 *
 * Contributor:
 * PortaMx corp. Germany - http://portamx.com
-* Partial Copyright 2008-2015 by PortaMx corp. corp.
+* Partial Copyright 2008-2014 by PortaMx corp. corp.
 *
 * END LICENSE BLOCK
 */
