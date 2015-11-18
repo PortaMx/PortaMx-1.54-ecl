@@ -6,7 +6,7 @@
 * \author PortaMx - Portal Management Extension
 * \author Copyright 2008-2012 by PortaMx - http://portamx.com
 * \version 1.53
-* \date 14.11.2014
+* \date 18.11.2015
 */
 
 if(file_exists(realpath('../../../../../Settings.php')))

@@ -4,7 +4,7 @@
 * Compatibility & ECL Subroutines for Portamx.
 *
 * \author PortaMx - Portal Management Extension
-* \author Copyright 2008-2012 by PortaMx - http://portamx.com
+* \author Copyright 2008-2015 by PortaMx - http://portamx.com
 * \version 1.54
 * \date 18.11.2015
 */

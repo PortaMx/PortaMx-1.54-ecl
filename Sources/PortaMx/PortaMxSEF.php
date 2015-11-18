@@ -3,7 +3,7 @@
 * \file PortaMxSEF.php
 * SEF functions for Portamx.
 *
-* \author Copyright 2008-2014 by PortaMx corp. - http://portamx.com
+* \author Copyright 2008-2015 by PortaMx corp. - http://portamx.com
 * \author Developer of the Original Code is Matt Zuba.
 * \version 1.54
 * \date 18.11.2015
@@ -27,7 +27,7 @@
 *
 * Contributor:
 * PortaMx corp. Germany - http://portamx.com
-* Partial Copyright 2008-2014 by PortaMx corp. corp.
+* Partial Copyright 2008-2015 by PortaMx corp. corp.
 *
 * END LICENSE BLOCK
 */
