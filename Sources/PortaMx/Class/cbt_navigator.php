@@ -5,8 +5,8 @@
 *
 * \author PortaMx - Portal Management Extension
 * \author Copyright 2008-2014 by PortaMx corp. - http://portamx.com
-* \version 1.53
-* \date 14.11.2014
+* \version 1.54
+* \date 18.11.2015
 */
 
 if(!defined('PortaMx'))
@@ -129,7 +129,6 @@ class pmxc_cbt_navigator extends PortaMxC_SystemBlock
 					// save the new cat
 					$cID = $row['id_cat'];
 					$this->cat_board[$cID]['name'] = $row['catname'];
-					$this->cat_board[$cID]['short_name'] = $this->txt_shorten($row['catname'], $this->cfg['config']['settings']['numlen']);
 					$bID = 0;
 				}
 
@@ -172,7 +171,6 @@ class pmxc_cbt_navigator extends PortaMxC_SystemBlock
 					censorText($row['subject']);
 					$topic[$row['id_topic']] = array(
 						'subject' => $row['subject'],
-						'short_subject' => $this->txt_shorten($row['subject'], empty($this->isRead[$row['id_topic']]) ? $this->cfg['config']['settings']['numlen'] - (4 +($row['child_level'] * 2)) : $this->cfg['config']['settings']['numlen'] - (3 +($row['child_level'] * 2))),
 						'post_name' => $row['poster_name'],
 						'post_time' => preg_replace('~<[^>]*>~i', '', timeformat($row['poster_time'])),
 						'id_msg' => $row['id_msg'],
@@ -260,7 +258,9 @@ class pmxc_cbt_navigator extends PortaMxC_SystemBlock
 			if(!empty($cats['boards']))
 			{
 				echo '
-					<div><a href="'. $scripturl . (!empty($modSettings['pmx_frontmode']) ? '?action=community;' : '') .'#c'. $cid .'" title="'. $txt['pmx_text_category'] . $cats['name'] .'"><b>'. $cats['short_name'].'</b></a></div>';
+					<div class="cbtshorttxt" style="padding-right:0">
+						<a class="cbtshorttxt" style="padding-right:0" href="'. $scripturl . (!empty($modSettings['pmx_frontmode']) ? '?action=community;' : '') .'#c'. $cid .'" title="'. $txt['pmx_text_category'] . $cats['name'] .'"><b>'. $cats['name'].'</b></a>
+					</div>';
 
 				foreach($cats['boards'] as $bid => $board)
 				{
@@ -274,7 +274,6 @@ class pmxc_cbt_navigator extends PortaMxC_SystemBlock
 					if($isInit && !empty($board['unread']) && !empty($this->cfg['config']['settings']['initexpandnew']))
 						$exp[] = $bid;
 
-					$board_shortname = $this->txt_shorten($board['name'], empty($board['unread']) ? $this->cfg['config']['settings']['numlen'] - (2 + ($board['level'] *3)) : $this->cfg['config']['settings']['numlen'] - (3 + ($board['level'] *3)));
 					echo '
 					<div style="margin-bottom:-2px; padding-'. (empty($context['right_to_left']) ? 'left' : 'right') .':'.($board['level'] * 8).'px;">';
 
@@ -283,12 +282,13 @@ class pmxc_cbt_navigator extends PortaMxC_SystemBlock
 						<img id="pmxcbt'. $this->cfg['id'] .'.img.'. $bid .'" src="'. $context['pmx_imageurl'] . ($board['isredir'] ? 'redir' : 'notopic') .'.png" alt="*" title="" />';
 					else
 						echo '
-						<img id="pmxcbt'. $this->cfg['id'] .'.img.'. $bid .'" onclick="NavCatToggle(\''. $bid .'\')" src="'. $context['pmx_imageurl'] . (in_array($bid, $exp) ? 'minus' : 'plus') .'.png" alt="*" title="'. $txt['pmx_cbt_colexp'] . $board['name'] .'" style="cursor:pointer;" />';
+						<img class="cbtshortcat" id="pmxcbt'. $this->cfg['id'] .'.img.'. $bid .'" onclick="NavCatToggle(\''. $bid .'\')" src="'. $context['pmx_imageurl'] . (in_array($bid, $exp) ? 'minus' : 'plus') .'.png" alt="*" title="'. $txt['pmx_cbt_colexp'] . $board['name'] .'" style="cursor:pointer;" />';
 
 					echo '
-						<span style="vertical-align:2px;">
-							<a href="'. $scripturl .'?board='. $bid .'.0" title="'. $txt['pmx_text_board'] . $board['name'] .'">'. $board_shortname .'</a>'.($board['unread'] ? '<img src="'. $context['pmx_imageurl'] .'unread.gif" alt="*" title="" />' : '').'
-						</span>
+						<div'. (!$board['unread'] ? ' style="padding-right:0"' : '') .' class="cbtshorttxt">
+							<a'. (!$board['unread'] ? ' style="padding-right:0"' : '') .' class="cbtshorttxt" href="'. $scripturl .'?board='. $bid .'.0" title="'. $txt['pmx_text_board'] . $board['name'] .'">'. $board['name'] .'</a>
+							'.($board['unread'] ? '<img src="'. $context['pmx_imageurl'] .'unread.gif" alt="*" title="" />' : '').'
+						</div>
 					</div>';
 
 					if($board['hastopics'])
@@ -298,11 +298,11 @@ class pmxc_cbt_navigator extends PortaMxC_SystemBlock
 
 						foreach($board['topics'] as $tid => $topic)
 						{
-							$short_subject = $this->txt_shorten($topic['subject'], empty($this->isRead[$tid]) ? $this->cfg['config']['settings']['numlen'] - (4 +($board['level'] * 2)) : $this->cfg['config']['settings']['numlen'] - (3 +($board['level'] * 2)));
 							$ttl = $txt['pmx_text_topic'] . $topic['subject'] .' '. $txt['by'] .' '. $topic['post_name'] .', '. $topic['post_time'];
 							echo '
-						<div style="padding-'. (empty($context['right_to_left']) ? 'left' : 'right') .':'.(17 + ($board['level'] * 5)).'px;">
-							<a href="'. $scripturl .'?topic='. $tid .'.msg'. (empty($this->isRead[$tid]) ? $topic['new_from'] .';topicseen#new' : $topic['id_msg'] .';topicseen#msg'. $topic['id_msg']) .'" title="'. $ttl .'">'. $short_subject .'</a>'. (empty($this->isRead[$tid]) ? '<img src="'. $context['pmx_imageurl'] .'unread.gif" alt="*" title="" />' : '').'
+						<div class="cbtshorttxt" style="'. (!empty($this->isRead[$tid]) ? 'padding-right:0; ' : '') .'padding-left:'. (17 + ($board['level'] * 5)).'px;">
+							<a class="cbtshorttxt"'. (!empty($this->isRead[$tid]) ? ' style="padding-right:0"' : '') .' href="'. $scripturl .'?topic='. $tid .'.msg'. (empty($this->isRead[$tid]) ? $topic['new_from'] .';topicseen#new' : $topic['id_msg'] .';topicseen#msg'. $topic['id_msg']) .'" title="'. $ttl .'">'. $topic['subject'] .'</a>
+							'. (empty($this->isRead[$tid]) ? '<img src="'. $context['pmx_imageurl'] .'unread.gif" alt="*" title="" />' : '') .'
 						</div>';
 						}
 
@@ -315,20 +315,6 @@ class pmxc_cbt_navigator extends PortaMxC_SystemBlock
 		// done
 		echo '
 				</div>';
-	}
-
-	/**
-	* txt_shorten.
-	* create a shorten subject
-	*/
-	function txt_shorten($value, $len)
-	{
-		global $smcFunc;
-
-		if($smcFunc['strlen']($value) <= $len)
-			return $value;
-
-		return $smcFunc['substr']($value, 0, $len) .'..';
 	}
 }
 ?>

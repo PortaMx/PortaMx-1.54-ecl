@@ -5,8 +5,8 @@
 *
 * \author PortaMx - Portal Management Extension
 * \author Copyright 2008-2014 by PortaMx corp. - http://portamx.com
-* \version 1.53
-* \date 14.11.2014
+* \version 1.54
+* \date 18.11.2015
 */
 
 if(file_exists(realpath('../../../../../Settings.php')))

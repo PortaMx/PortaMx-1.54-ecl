@@ -4,8 +4,8 @@
 *
 * \author PortaMx - Portal Management Extension
 * \author Copyright 2008-2014 by PortaMx corp. - http://portamx.com
-* \version 1.53
-* \date 14.11.2014
+* \version 1.54
+* \date 18.11.2015
 */
 #pmx_form {
 	clear: both;
@@ -220,6 +220,7 @@ span.botslice.windowbg2 span
 .plainbox.blockcontent div.windowbg2
 {
 	border-radius: 6px;
+	padding: 10px 0;
 }
 img.grid_images
 {
@@ -378,6 +379,36 @@ span.pmxtitle.pmxcenter
 	float: right;
 }
 
+/* cbt navigator */
+.cbttoggle {
+	float: left;
+	margin-top: 4px;
+	padding-right: 3px;
+}
+.cbtshorttxt {
+	display: block;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	padding-right: 4px;
+	outline: 0;
+	white-space: nowrap;
+}
+.cbtshorttxt img {
+	float: right;
+	margin-top: -13px;
+	margin-right: -3px;
+}
+.cbtshortcat {
+	float: left;
+	display: block;
+	cursor: pointer;
+	padding-right: 2px;
+	margin-top: 2px;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+}
+
 /* shoutbox */
 .shoutbox_core
 {
@@ -497,6 +528,12 @@ ul.statistics li span
 .polloptions
 {
 	line-height: 1.4em;
+}
+.poll_bar
+{
+	background: linear-gradient(#60a0d0, #5070a0);
+	border: solid 1px #a0a0a0;
+	border-radius: 4px;
 }
 
 /* download */

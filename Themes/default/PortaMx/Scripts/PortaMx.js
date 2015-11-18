@@ -4,8 +4,8 @@
 *
 * \author PortaMx - Portal Management Extension
 * \author Copyright 2008-2014 by PortaMx corp. - http://portamx.com
-* \version 1.53
-* \date 14.11.2014
+* \version 1.54
+* \date 18.11.2015
 */
 
 // PortaMx Opacity Fader
@@ -230,26 +230,34 @@ function pmxWinGetTop(uid)
 	return ypos;
 }
 
+// not exist image handling
+function onPmxImgError(img)
+{
+	img.src = pmx_failed_image;
+	img.alt = pmx_failed_image_text;
+	img.title = pmx_failed_image_text;
+	img.style.height = '0px';
+	img.style.width = '0px';
+	img.onerror = null;
+	img.complete = true;
+	portamx_EqualHeight();
+}
+
 // Pmx onLoad fuction
 function portamx_onload()
 {
-	window.setTimeout('portamx_imgResize()', 150);
-}
+	var pmxImgs = document.getElementsByTagName('img');
+	for(var i = 0; i < pmxImgs.length; i++)
+		pmxImgs[i].onerror = function(){onPmxImgError(this)};
 
-// not exist image handling
-window.onerror = null;
-function onPmxImgError(image)
-{
-	image.src = pmx_failed_image;
-	image.onerror = null;
-	return true;
+	window.setTimeout('portamx_imgResize()', 50);
 }
 
 // image resize
 function portamx_imgResize()
 {
-	var pmxImgFailed = false;
 	var Xsize, Ysize, fact;
+	pmxImgFailed = false;
 	for(var i = 0; i < pmx_rescale_images.length; i++)
 	{
 		possibleRows = document.getElementsByName(pmx_rescale_images[i].name);
@@ -268,27 +276,11 @@ function portamx_imgResize()
 				pmxImgFailed = true;
 		}
 	}
-
 	if(pmxImgFailed)
-		window.setTimeout('portamx_imgResize()', 200);
-	else
-		portamx_EqualHeight();
-}
+		window.setTimeout('portamx_imgResize()', 50);
 
-// called from smc_toggle on expand
-function pmxExpandEQH()
-{
-	portamx_EqualHeight();
-	return false;
+	portamx_EqualHeight(pmxImgFailed);
 }
-
-// called from window.resize
-function pmxExpandEQHresize()
-{
-	window.setTimeout('portamx_EqualHeight()', 500);
-	return false;
-}
-window.onresize = pmxExpandEQHresize;
 
 // set div's to equal height
 function portamx_EqualHeight()
@@ -306,7 +298,6 @@ function portamx_EqualHeight()
 		if(possibleRows[i].className.indexOf('pmxEQH') == -1)
 			continue;
 
-		possibleRows[i].style.minHeight = '0';
 		possibleRows[i].style.height = null;
 		cName = possibleRows[i].className.replace(/pmxEQH/, '');
 		if(!modifyRow[cName])
@@ -344,22 +335,33 @@ function portamx_EqualHeight()
 		if(modifyRow[modifyTypes[t]])
 		{
 			for(var i = 0; i < modifyRow[modifyTypes[t]].elm.length; i++)
-			{
-				modifyRow[modifyTypes[t]].elm[i].style.minHeight = modifyRow[modifyTypes[t]].height[i] +'px';
 				modifyRow[modifyTypes[t]].elm[i].style.height = modifyRow[modifyTypes[t]].height[i] +'px';
-			}
 		}
 	}
-	modifyRow = null;
-
 	pmx_RestoreScrollTop();
 }
+
+// called from smc_toggle on expand
+function pmxExpandEQH()
+{
+	window.setTimeout('portamx_EqualHeight()', 100);
+	return false;
+}
+
+// called from window.resize
+function pmxExpandEQHresize()
+{
+	window.setTimeout('portamx_EqualHeight()', 500);
+	return false;
+}
+window.onresize = pmxExpandEQHresize;
 
 // Restore window top postion
 function pmx_RestoreScrollTop(top)
 {
 	if(typeof(pmx_restore_top) == 'number' || typeof(top) == 'number')
 		window.scrollTo(0, (typeof(pmx_restore_top) == 'number' ? pmx_restore_top : top));
+	pmx_restore_top = '';
 }
 
 // Get the Popup position (X, Y)

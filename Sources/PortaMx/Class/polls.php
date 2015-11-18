@@ -5,8 +5,8 @@
 *
 * \author PortaMx - Portal Management Extension
 * \author Copyright 2008-2014 by PortaMx corp. - http://portamx.com
-* \version 1.53
-* \date 14.11.2014
+* \version 1.54
+* \date 18.11.2015
 */
 
 if(!defined('PortaMx'))
@@ -25,6 +25,7 @@ class pmxc_polls extends PortaMxC_SystemBlock
 	var $currentpoll;				///< array(id, state)
 	var $polldata;					///< polldata
 	var $boardsAllowed;			///< poll view access
+	var $pollChoices;				///< users poll choices
 
 	/**
 	* checkCacheStatus.
@@ -117,62 +118,90 @@ class pmxc_polls extends PortaMxC_SystemBlock
 
 		if($this->visible)
 		{
+			// get users pollchoices
+			$this->PollChoices = array();
+
+			if(empty($user_info['is_guest']))
+			{
+				$request = $smcFunc['db_query']('', '
+						SELECT id_poll, id_choice
+						FROM {db_prefix}log_polls
+						WHERE id_poll IN ({array_int:polls}) AND id_member = {int:current_member}',
+					array(
+						'polls' => $this->cfg['config']['settings']['polls'],
+						'current_member' => $user_info['id'],
+					)
+				);
+
+				if($smcFunc['db_num_rows']($request) > 0)
+				{
+					while($row = $smcFunc['db_fetch_assoc']($request))
+					{
+						if(isset($this->PollChoices[$row['id_poll']]))
+							$this->PollChoices[$row['id_poll']] .= $row['id_choice'] .',';
+						else
+							$this->PollChoices[$row['id_poll']] = $row['id_choice'] .',';
+					}
+					$smcFunc['db_free_result']($request);
+				}
+				foreach($this->PollChoices as $key => $val)
+					$this->PollChoices[$key] = explode(',', trim($val, ','));
+			}
+
 			// load javascript to header
 			if(strpos($context['html_headers'], 'pmx_VotePoll') === false)
-				$context['html_headers'] .= '
-	<script type="text/javascript"><!-- // --><![CDATA[
-		function pmx_VotePoll(id, elm)
-		{
-			// check if any option selected
-			var isVoted = false;
-			var elmName = "pmx_pollopt" + id + "_";
-			var i = 0;
-			while(document.getElementById(elmName + i))
+				PortaMx_inlineJS('
+			function pmx_VotePoll(id, elm)
 			{
-				isVoted = (document.getElementById(document.getElementById(elmName + i).htmlFor).checked == true ? true : isVoted);
-				i++;
+				// check if any option selected
+				var isVoted = false;
+				var elmName = "pmx_pollopt" + id + "_";
+				var i = 0;
+				while(document.getElementById(elmName + i))
+				{
+					isVoted = (document.getElementById(document.getElementById(elmName + i).htmlFor).checked == true ? true : isVoted);
+					i++;
+				}
+				if(isVoted)
+				{
+					pmxWinGetTop(\'poll\'+ id);
+					document.getElementById("pmx_voteform" + id).submit();
+				}
+				else
+					alert("'. $txt['pmx_poll_novote_opt'] .'");
 			}
-			if(isVoted)
+			function pmx_ShowPollResult(id, poll)
+			{
+				document.getElementById("pxm_allowvotepoll" + id).style.display = "none";
+				document.getElementById("pxm_allowviewpoll" + id).style.display = "";
+				pmx_SavePolldata(id, poll, 1);
+				return false;
+			}
+			function pmx_ShowPollVote(id, poll)
+			{
+				document.getElementById("pxm_allowviewpoll" + id).style.display = "none";
+				document.getElementById("pxm_allowvotepoll" + id).style.display = "";
+				pmx_SavePolldata(id, poll, 0);
+				return false;
+			}
+			function pmx_ChangePollVote(id, elm)
 			{
 				pmxWinGetTop(\'poll\'+ id);
 				document.getElementById("pmx_voteform" + id).submit();
 			}
-			else
-				alert("'. $txt['pmx_poll_novote_opt'] .'");
-		}
-		function pmx_ShowPollResult(id, poll)
-		{
-			document.getElementById("pxm_allowvotepoll" + id).style.display = "none";
-			document.getElementById("pxm_allowviewpoll" + id).style.display = "";
-			pmx_SavePolldata(id, poll, 1);
-			return false;
-		}
-		function pmx_ShowPollVote(id, poll)
-		{
-			document.getElementById("pxm_allowviewpoll" + id).style.display = "none";
-			document.getElementById("pxm_allowvotepoll" + id).style.display = "";
-			pmx_SavePolldata(id, poll, 0);
-			return false;
-		}
-		function pmx_ChangePollVote(id, elm)
-		{
-			pmxWinGetTop(\'poll\'+ id);
-			document.getElementById("pmx_voteform" + id).submit();
-		}
-		function pmx_ChangeCurrentPoll(id, elm)
-		{
-			var idx = elm.selectedIndex;
-			var pollid = elm.options[idx].value;
-			pmx_SavePolldata(id, pollid, 0);
-			document.getElementById("pollchanged" + id).value = pollid;
-			pmxWinGetTop(\'poll\'+ id);
-			document.getElementById("pmx_votechange" + id).submit();
-		}
-		function pmx_SavePolldata(id, poll, state)
-		{
-			pmx_setCookie("poll" + id, poll + "," + state);
-		}
-	// ]]></script>';
+			function pmx_ChangeCurrentPoll(id, elm)
+			{
+				var idx = elm.selectedIndex;
+				var pollid = elm.options[idx].value;
+				pmx_SavePolldata(id, pollid, 0);
+				document.getElementById("pollchanged" + id).value = pollid;
+				pmxWinGetTop(\'poll\'+ id);
+				document.getElementById("pmx_votechange" + id).submit();
+			}
+			function pmx_SavePolldata(id, poll, state)
+			{
+				pmx_setCookie("poll" + id, poll + "," + state);
+			}');
 		}
 
 		// return the visibility flag (true/false)
@@ -343,7 +372,7 @@ class pmxc_polls extends PortaMxC_SystemBlock
 				foreach ($options as $i => $option)
 				{
 					$bar = floor(($option[1] * 100) / $divisor);
-					$tablen = ($tablen < $bar ? $bar : $tablen);
+					$tablen = $tablen < $bar ? $bar : $tablen;
 					$this->polls['options'][$i] = array(
 						'id' => 'options'. $this->cfg['id'] .'-' . $i,
 						'percent' => round((($option[1] * 100) / $divisor), 0),
@@ -424,20 +453,32 @@ class pmxc_polls extends PortaMxC_SystemBlock
 				<div id="pxm_allowviewpoll'. $this->cfg['id'] .'"'. (!empty($this->polls['allow_vote']) && $this->currentpoll['state'] == '0' ? ' style="display:none"' : '') .'>
 					<table width="100%" border="0" cellspacing="0" cellpadding="0">';
 
-			$tablen = (100 / $this->polls['tablen']) * (in_array($this->cfg['side'], array('right', 'left')) ? 0.85 : 0.90);
-			foreach($this->polls['options'] as $option)
+			$tablen = (100 / $this->polls['tablen']);
+			$tablen = ($tablen > 100 ? 100 : $tablen);
+			$ownpolls = $this->PollChoices[$this->polls['id']];
+
+			foreach($this->polls['options'] as $key => $option)
 			{
-				$barlen = ($option['percent'] == 0 ? '0' : ceil($option['percent'] * $tablen) .'%');
+				$barlen = ($option['percent'] == 0 ? '0' : ceil($option['percent'] * $tablen));
+				$barlen = ($barlen > 100 ? 100 : $barlen);
+
 				echo '
 						<tr>
-							<td align="'. ($context['right_to_left'] ? 'right' : 'left') .'" width="95%" style="height:2.8em;">'. $option['option'] .'
-								<div style="margin:0px 3px;">
-									<img src="'. $context['pmx_imageurl'] .'poll_'. ($context['right_to_left'] ? 'right' : 'left') .'.gif" alt="-" /><img src="'. $context['pmx_imageurl'] .'poll_middle.gif" height="12" alt="=" style="margin:0px -1px; width:'. $barlen .';" /><img src="'. $context['pmx_imageurl'] .'poll_'. ($context['right_to_left'] ? 'left' : 'right') .'.gif" alt="-" />
+							<td align="'. (empty($context['right_to_left']) ? 'left' : 'right') .'" style="height:35px;width:95%">'. $option['option'] .'
+								<div style="height: 10px;width:'. $barlen .'%;"'. ($barlen > 0 ? ' class="poll_bar"' : '') .'>
 								</div>
 							</td>
-							<td align="'. ($context['right_to_left'] ? 'left' : 'right') .'" style="white-space:nowrap;">
-								<div style="margin-top:13px;">
-									'. $option['votes'] .' ('. $option['percent'] .'%)
+							<td align="'. (empty($context['right_to_left']) ? 'right' : 'left') .'">
+								<div style="margin-top:14px;white-space:nowrap;margin-'. (empty($context['right_to_left']) ? 'left' : 'right') .':8px;">';
+
+				if(is_array($ownpolls) && in_array($key, $ownpolls))
+					echo '
+									<strong>'. $option['votes'] .' ('. $option['percent'] .'%)</strong>';
+				else
+					echo '
+									'. $option['votes'] .' ('. $option['percent'] .'%)';
+
+				echo '
 								</div>
 							</td>
 						</tr>';

@@ -5,8 +5,8 @@
 *
 * \author PortaMx - Portal Management Extension
 * \author Copyright 2008-2014 by PortaMx corp. - http://portamx.com
-* \version 1.53
-* \date 14.11.2014
+* \version 1.54
+* \date 18.11.2015
 */
 
 if(!defined('SMF'))
@@ -205,34 +205,31 @@ function ParseXmlurl($feedurl, $resposetime, $headerstart = '<?xml')
 	$context['pmx']['feed_error_text'] = '';
 
 	// get host and domain from feedurl
-	preg_match('@^(?:http://)?([^/|^?]+)@i', $feedurl, $host);
-	if(!isset($host[1]))
-		return '';
+	$parts = parse_url($feedurl);
+	if($parts['scheme'] == 'https')
+		$port = 443;
+	else
+		$port = 80;
 
-	preg_match('@'. $host[1] .'(.*)@i', $feedurl, $domain);
-	if(!isset($domain[1]))
-		return '';
-
-	// prepare the http header
-	$header = "GET ". $domain[1] ." HTTP/1.1\r\n";
-	$header .= "Host: ". $host[1] ."\r\n";
+	// prepare the header
+	$header = "GET ". $parts['path'] ." HTTP/1.1\r\n";
+	$header .= "Host: ". $parts['host'] ."\r\n";
 	$header .= "Connection: Close\r\n\r\n";
 
 	// open the socket
-	$handle = fsockopen($host[1], 80, $eNbr, $eStr, intval($resposetime));
+	$content = '';
+	$timeout = false;
+	$handle = @fsockopen(($parts['scheme'] == 'https' ? 'ssl://' : '') . $parts['host'], $port, $eNbr, $eStr, intval($resposetime));
 	if($handle === false)
 	{
 		log_error(sprintf($txt['feed_response_error'], $feedurl, $resposetime));
 		$context['pmx']['feed_error_text'] = $eStr;
 		return '';
 	}
-
-	// send http request
+	// send request
 	fputs($handle, $header);
 
 	// read the http response
-	$content = '';
-	$timeout = false;
 	stream_set_timeout($handle, intval($resposetime));
 	while(!feof($handle) && empty($timeout))
 	{
@@ -796,6 +793,32 @@ function PortaMx_compressJS($data)
 	}
 	else
 		return $data;
+}
+
+/**
+* load inline Javascript (header / footer)
+*/
+function PortaMx_inlineJS($data, $head = true, $addscrline = true)
+{
+	global $context;
+
+	$buffer = '';
+	if(!empty($addscrline))
+	{
+		$buffer .= '
+<script type="text/javascript"><!-- // --><![CDATA[';
+		$buffer .= PortaMx_compressJS($data);
+		$buffer .= '// ]]></script>';
+	}
+	else
+		$buffer .= PortaMx_compressJS($data);
+
+	if(!empty($head))
+		$context['html_headers'] .= $buffer;
+	else
+		$context['pmx']['html_footer'] .= $buffer;
+
+	unset($buffer);
 }
 
 /**
@@ -2767,9 +2790,12 @@ function PortaMx_headers($action = '')
 	if(empty($context['pmx']['settings']['disableHS']))
 	{
 		$context['html_headers'] .= '
-	<link rel="stylesheet" type="text/css" href="'. PortaMx_loadCompressed('highslide.css', array('dir' => $settings['default_theme_dir'] .'/highslide/', 'url' => $settings['default_theme_url'] .'/highslide/')) .'" />
-	<script type="text/javascript" src="'. $settings['default_theme_url'] .'/highslide/highslide-full.packed.js"></script>
-	<script language="JavaScript" type="text/javascript"><!-- // --><![CDATA[
+<link rel="stylesheet" type="text/css" href="'. PortaMx_loadCompressed('highslide.css', array('dir' => $settings['default_theme_dir'] .'/highslide/', 'url' => $settings['default_theme_url'] .'/highslide/')) .'" />
+<script type="text/javascript" src="'. $settings['default_theme_url'] .'/highslide/highslide-full.packed.js"></script>';
+
+	PortaMx_inlineJS('
+		var pmx_failed_image = \''. $context['pmx_imageurl'] .'missing_image.png\';
+		var pmx_failed_image_text = \''. $txt['pmx_hs_noimage'] .'\';
 		hs.graphicsDir = "'. $settings['default_theme_url'] .'/highslide/graphics/";
 		hs.blockRightClick = true;
 		hs.fadeInOut = true;
@@ -2782,84 +2808,65 @@ function PortaMx_headers($action = '')
 		hs.enableKeyListener = false;
 		hs.zIndexCounter = 10001;
 		hs.align = "center";
-		hs.allowSizeReduction = true;
-	// ]]></script>';
+		hs.allowSizeReduction = true;');
 
 		if(!empty($context['right_to_left']))
 			$context['html_headers'] .= '
-	<link rel="stylesheet" type="text/css" href="'. PortaMx_loadCompressed('highslide_rtl.css', array('dir' => $settings['default_theme_dir'] .'/highslide/', 'url' => $settings['default_theme_url'] .'/highslide/')) .'" />';
+<link rel="stylesheet" type="text/css" href="'. PortaMx_loadCompressed('highslide_rtl.css', array('dir' => $settings['default_theme_dir'] .'/highslide/', 'url' => $settings['default_theme_url'] .'/highslide/')) .'" />';
 	}
 
 	$context['html_headers'] .= '
-	<link rel="stylesheet" type="text/css" href="'. PortaMx_loadCompressed('portamx.css') .'" />
-	<script language="JavaScript" type="text/javascript"><!-- // --><![CDATA[
+<link rel="stylesheet" type="text/css" href="'. PortaMx_loadCompressed('portamx.css') .'" />';
+	PortaMx_inlineJS('
 		function pmx_setCookie(sName, sValue){return pmxXMLrequest("action=xmlhttp;pmxcook=setcookie;xml", "var="+ sName +"&val="+ encodeURIComponent(sValue) +"&'. $context['session_var'] .'=' .$context['session_id'] .'");}
-		function pmx_getCookie(sName){return pmxXMLrequest("action=xmlhttp;pmxcook=getcookie;xml;name="+ sName);}
-	// ]]></script>';
+		function pmx_getCookie(sName){return pmxXMLrequest("action=xmlhttp;pmxcook=getcookie;xml;name="+ sName);}');
 
 	if(!empty($context['right_to_left']))
 		$context['html_headers'] .= '
-	<link rel="stylesheet" type="text/css" href="'. PortaMx_loadCompressed('portamx_rtl.css') .'" />';
+<link rel="stylesheet" type="text/css" href="'. PortaMx_loadCompressed('portamx_rtl.css') .'" />';
 
 		// load additional css file on a fullsize frontpage
 	if($action == 'frontpage' && $context['pmx']['settings']['frontpage'] == 'fullsize' && file_exists($settings['theme_dir'] .'/css/pmx_frontpage.css'))
 		$context['html_headers'] .= '
-	<link rel="stylesheet" type="text/css" href="'. $settings['theme_url'] .'/css/pmx_frontpage.css'. $context['pmx_jsrel'] .'" />';
+<link rel="stylesheet" type="text/css" href="'. $settings['theme_url'] .'/css/pmx_frontpage.css'. $context['pmx_jsrel'] .'" />';
 
 	$context['html_headers'] .= '
-	<!--[if IE]>
-	<style type="text/css">
-		#xbarleft:hover, #xbarright:hover, #xbartop:hover, #xbarbottom:hover, #xbarhead:hover, #xbarfoot:hover
-		{
-			filter: Alpha(Opacity=70);
-			filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=70);
-		}
-	</style>
-	<![endif]-->
-	<style type="text/css">
-		#preview_section{ margin-top:'. abs($tbpad) .'px; }
-		#pmx_toppad{ margin-top:'. $tbpad .'px;'. (!empty($context['pmx']['settings']['forumscroll']) ? ' overflow:auto;' : '') .' }
-		.pmx_maintable{ '. (!empty($context['pmx']['settings']['forumscroll']) ? 'table-layout:fixed;' : '') .' }';
+<!--[if IE]><style type="text/css">#xbarleft:hover, #xbarright:hover, #xbartop:hover, #xbarbottom:hover, #xbarhead:hover, #xbarfoot:hover; {filter: Alpha(Opacity=70);filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=70);}</style><![endif]-->
+<style type="text/css">#preview_section{ margin-top:'. abs($tbpad) .'px; } #pmx_toppad{ margin-top:'. $tbpad .'px;'. (!empty($context['pmx']['settings']['forumscroll']) ? ' overflow:auto;' : '') .' } .pmx_maintable{'. (!empty($context['pmx']['settings']['forumscroll']) ? 'table-layout:fixed;' : '') .'}';
 
 	if(empty($context['pmx']['collapse']['head']))
-		$context['html_headers'] .= '
-		#xbartop{ top: 1px; }';
+		$context['html_headers'] .= '	#xbartop{ top: 1px; }';
 
 	if(empty($context['pmx']['collapse']['foot']))
-		$context['html_headers'] .= '
-		#xbarbottom{ bottom: 1px; }';
+		$context['html_headers'] .= '	#xbarbottom{ bottom: 1px; }';
 
 	if($action == 'frontpage')
-		$context['html_headers'] .= '
-		.bbc_code{ max-height: 7em; }';
+		$context['html_headers'] .= '.bbc_code{ max-height: 7em; }';
 
 	if(!empty($context['pmx_style_isCore']))
-		$context['html_headers'] .= '
-		.pmxinfo{ padding-top: 0.5em !important;}';
+		$context['html_headers'] .= '.pmxinfo{ padding-top: 0.5em !important;}';
 
-	$context['html_headers'] .= '
-	</style>';
+	$context['html_headers'] .= '</style>';
 
 	// javascript for the footer part
-	$context['pmx']['html_footer'] .= '
+	PortaMx_inlineJS('
 	var pmx_xBarKeys = '. (!empty($context['pmx']['xbarkeys']) ? 'true' : 'false') .';
 	var xBarKeys_Status = pmx_xBarKeys;
-	var panel_text = new Object();';
+	var panel_text = new Object();', false, false);
 
 	foreach($txt['pmx_block_panels'] as $key => $val)
-		$context['pmx']['html_footer'] .= '
-	panel_text["'. $key .'"] = "'. htmlentities($val, ENT_QUOTES, $context['pmx']['encoding']) .'";';
+		PortaMx_inlineJS('
+	panel_text["'. $key .'"] = "'. htmlentities($val, ENT_QUOTES, $context['pmx']['encoding']) .'";', false, false);
 
-	$context['pmx']['html_footer'] .= '
+	PortaMx_inlineJS('
 	function setUpshrinkTitles() {
 		if(this.opt.bToggleEnabled)
 		{	var panel = this.opt.aSwappableContainers[0].substring(8, this.opt.aSwappableContainers[0].length - 3).toLowerCase();
 			document.getElementById("xbar" + panel).setAttribute("title", (this.bCollapsed ? "'. htmlentities($txt['pmx_hidepanel'], ENT_QUOTES, $context['pmx']['encoding']) .'" : "'. htmlentities($txt['pmx_showpanel'], ENT_QUOTES, $context['pmx']['encoding']) .'") + panel_text[panel]); }
-	}';
+	}', false, false);
 
 	foreach($panel_names as $pname)
-	{
-		$context['pmx']['html_footer'] .= '
+		PortaMx_inlineJS('
 	var '. $pname .'Panel = new smc_Toggle({
 		bToggleEnabled: '. (empty($context['pmx']['show_'. $pname .'panel']) ? 'false' : 'true') .',
 		bCurrentlyCollapsed: '. (empty($options['collapse_'. $pname]) ? 'false' : 'true') .',
@@ -2873,7 +2880,6 @@ function PortaMx_headers($action = '')
 			sCookieName: \'upshr'. $pname .'\',
 			sCookieValue: \''. $options['collapse_'. $pname] .'\'
 		}
-	});';
-	}
+	});', false, false);
 }
 ?>

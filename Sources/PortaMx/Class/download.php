@@ -5,8 +5,8 @@
 *
 * \author PortaMx - Portal Management Extension
 * \author Copyright 2008-2014 by PortaMx corp. - http://portamx.com
-* \version 1.53
-* \date 14.11.2014
+* \version 1.54
+* \date 18.11.2015
 */
 
 if(!defined('PortaMx'))
@@ -53,38 +53,56 @@ class pmxc_download extends PortaMxC_SystemBlock
 				);
 
 				$dlacs = implode('=1,', $this->cfg['config']['settings']['download_acs']);
-				$entrys = $smcFunc['db_num_rows']($request);
-				if($entrys > 0)
+				$entrys = array();
+				$idx = 1;
+				while($row = $smcFunc['db_fetch_assoc']($request))
 				{
-					while($row = $smcFunc['db_fetch_assoc']($request))
+					$ofstr = trim(substr($row['subject'], 0, strpos($row['subject'], ' ')));
+					$ofs = intval($ofstr);
+					$idx = !empty($ofs) && $ofs !== $idx ? $ofs : $idx++;
+					if(!empty($entrys[$idx]))
 					{
-						$this->download_content .= '
+						end($entrys);
+						$ixd = key($entrys);
+						$idx++;
+					}
+					$subj = !empty($ofs) ? trim(substr($row['subject'], strlen($ofstr))) : $row['subject'];
+					$entrys[$idx] = '
 						<div style="text-align:'. $L_R .';">';
 
-						if(allowPmxGroup($dlacs))
-							$this->download_content .= '
+					if(allowPmxGroup($dlacs))
+						$entrys[$idx] .= '
 							<a href="'. $scripturl .'?action=dlattach;id='. $row['id_attach'] .';fld='. $this->cfg['id'] .'">
-								<img style="vertical-align:middle;" src="'. $context['pmx_imageurl'] .'download.png" alt="*" title="'. (empty($row['file_order']) ? $row['subject'] : substr($row['subject'], 4)) .'" /></a>';
-
-						if($user_info['is_admin'])
-							$this->download_content .= '
-							<a href="'. $scripturl .'?topic='. $row['id_topic'] .'">
-								<strong>'. $row['subject'] .'</strong>
+								<img style="vertical-align:middle;" src="'. $context['pmx_imageurl'] .'download.png" alt="*" title="'. $subj .'" />
 							</a>';
-						else
-							$this->download_content .= '
-							<strong>'. $row['subject'] .'</strong>';
 
-						$this->download_content .= '
-							<div class="dlcomment">'. parse_bbc(trim($row['body'])) .'</div>
-							<b>['. round($row['size'] / 1000, 3) .'</b> '. $txt['pmx_kb_downloads'] .'<b>'. $row['downloads'] .'</b>]
-						</div>' . ($entrys > 1 ? '<hr />' : '');
-						$entrys--;
-					}
-					$smcFunc['db_free_result']($request);
+					if($user_info['is_admin'])
+						$entrys[$idx] .= '
+						<a href="'. $scripturl .'?topic='. $row['id_topic'] .'">
+							<strong>'. $subj .'</strong>
+						</a>';
+					else
+						$entrys[$idx] .= '
+							<strong>'. $subj .'</strong>';
+
+					$entrys[$idx] .= '
+						<div class="dlcomment">'. parse_bbc(trim($row['body'])) .'</div>
+						<b>['. round($row['size'] / 1000, 3) .'</b> '. $txt['pmx_kb_downloads'] .'<b>'. $row['downloads'] .'</b>]
+					</div>' . ($entrys > 1 ? '<hr />' : '');
 				}
-				else
+				$smcFunc['db_free_result']($request);
+
+				if(empty($idx))
 					$this->download_content .= '<br />'. $txt['pmx_download_empty'];
+				else
+				{
+					ksort($entrys);
+					foreach($entrys as $cont)
+						$this->download_content .= $cont;
+
+					unset($entrys);
+					unset($cont);
+				}
 			}
 			else
 				$this->download_content .= '<br />'. $txt['pmx_download_empty'];

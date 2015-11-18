@@ -5,8 +5,8 @@
 *
 * \author PortaMx - Portal Management Extension
 * \author Copyright 2008-2014 by PortaMx corp. - http://portamx.com
-* \version 1.53
-* \date 14.11.2014
+* \version 1.54
+* \date 18.11.2015
 */
 
 /**
@@ -134,6 +134,7 @@ function Pmx_Frame_top($cfg, $count)
 		}
 
 		// show content frame
+		$spanclass = $isCustFrame && !empty($cfg['config']['visuals']['body']) ? $cfg['config']['visuals']['body'] .' ' : '';
 		$bodyclass = trim($cfg['config']['visuals']['body'] .' '. $cfg['config']['visuals']['frame']);
 		$frame = false;
 
@@ -295,16 +296,16 @@ function Pmx_Frame_top($cfg, $count)
 	// if header or frame and can collaps?
 	if(!empty($cfg['config']['collapse']) && $cfg['config']['visuals']['header'] != 'none')
 	{
-		$context['pmx']['html_footer'] .= '
-	var '. $IDtype .' = new smc_Toggle({
+		$temp = '
+		var '. $IDtype .' = new smc_Toggle({
 		bToggleEnabled: true,
 		bCurrentlyCollapsed: '. (empty($options['collapse'. $IDtype]) ? 'false' : 'true') .',';
 
 		if(in_array($cfg['blocktype'], array('newposts', 'boardnews', 'boardnewsmult', 'promotedposts', 'rss_reader')))
-		$context['pmx']['html_footer'] .= '
+		$temp .= '
 		funcOnBeforeExpand: pmxExpandEQH,';
 
-		$context['pmx']['html_footer'] .= '
+		$temp .= '
 		aSwappableContainers: [
 			\'upshrink_'. $IDtype .'\'
 		],
@@ -313,17 +314,17 @@ function Pmx_Frame_top($cfg, $count)
 				sId: \'upshrink_'. $IDtype .'_Img\',';
 
 		if(!empty($cfg['config']['collapse']) && $context['pmx']['settings']['shrinkimages'] != 2)
-			$context['pmx']['html_footer'] .= '
+			$temp .= '
 				srcCollapsed: \''. $context['pmx_img_colapse'] .'\',';
 
-		$context['pmx']['html_footer'] .= '
+		$temp .= '
 				altCollapsed: '. (JavaScriptEscape($txt['pmx_expand'] . $blocktitle)) .',';
 
 		if($cfg['config']['collapse'] == 1 && $context['pmx']['settings']['shrinkimages'] != 2)
-			$context['pmx']['html_footer'] .= '
+			$temp .= '
 				srcExpanded: \''. $context['pmx_img_expand']  .'\',';
 
-		$context['pmx']['html_footer'] .= '
+		$temp .= '
 				altExpanded: '. (JavaScriptEscape($txt['pmx_collapse'] . $blocktitle)) .'
 			}
 		],
@@ -333,6 +334,8 @@ function Pmx_Frame_top($cfg, $count)
 			sCookieValue: \''. (!empty($options['collapse'. $IDtype]) ? $options['collapse'. $IDtype] : 0) .'\'
 		}
 	});';
+	PortaMx_inlineJS($temp, false, false);
+	unset($temp);
 	}
 
 	return array($spanclass, $isCustFrame, $frame);

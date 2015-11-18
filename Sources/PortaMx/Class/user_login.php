@@ -5,8 +5,8 @@
 *
 * \author PortaMx - Portal Management Extension
 * \author Copyright 2008-2014 by PortaMx corp. - http://portamx.com
-* \version 1.53
-* \date 14.11.2014
+* \version 1.54
+* \date 18.11.2015
 */
 
 if(!defined('PortaMx'))
@@ -244,7 +244,7 @@ class pmxc_user_login extends PortaMxC_SystemBlock
 									function ChangeLang'.$this->cfg['id'].'(elm)
 									{
 										pmxWinGetTop(\'user'. $this->cfg['id'] .'\');
-										document.getElementById("pmxlangchg'.$this->cfg['id'].'").action = smf_scripturl + "?language=" + elm.options[elm.selectedIndex].value + ";pmxrd='. base64_encode(str_replace(array($scripturl, '?'), '', getCurrentUrl())) .'";
+										document.getElementById("pmxlangchg'.$this->cfg['id'].'").action = smf_scripturl + "?language="+ elm.options[elm.selectedIndex].value +";pmxrd='. base64_encode(str_replace(array($scripturl, '?'), '', getCurrentUrl())) .'";
 										document.getElementById("pmxlangchg'.$this->cfg['id'].'").submit();
 									}
 								// ]]></script>';

@@ -2,10 +2,10 @@
 <!DOCTYPE package-info SYSTEM "http://www.simplemachines.org/xml/package-info">
 <package-info xmlns="http://www.simplemachines.org/xml/package-info" xmlns:smf="http://www.simplemachines.org/">
 
-	<name>PortaMx 1.53 ecl</name>
+	<name>PortaMx 1.54 ecl</name>
 	<id>portamx_corp:PortaMx</id>
 	<type>modification</type>
-	<version>1.53</version>
+	<version>1.54</version>
 
 	<install for="2.0*">
 		<readme type="file" parsebbc="true">install/readme.bbc</readme>
@@ -50,6 +50,20 @@
 		<require-file name="admin_images/pmx_adm_sef.gif" destination="$imagesdir/admin" />
 		<require-file name="admin_images/pmx_adm_languages.gif" destination="$imagesdir/admin" />
 		<require-file name="admin_images/pmx_adm_settings.gif" destination="$imagesdir/admin" />
+		<redirect url="$scripturl?action=admin;area=pmx_center" timeout="60000">install/installdone.html</redirect>
+	</upgrade>
+
+	<upgrade from="1.53" for="2.0*">
+		<readme type="file" parsebbc="true">install/readme.bbc</readme>
+		<database type="file">install/dbinstall.php</database>
+		<require-dir name="Sources/PortaMx" destination="$sourcedir" />
+		<require-dir name="Themes/default/PortaMx" destination="$themedir" />
+		<require-dir name="Themes/default/highslide" destination="$themedir" />
+		<require-dir name="Themes/default/languages/PortaMx" destination="$languagedir" />
+		<require-dir name="Smileys/PortaMx" destination="$smileysdir" />
+		<require-dir name="ckeditor" destination="$boarddir" />
+		<require-dir name="editor_uploads" destination="$boarddir" />
+		<require-file name="Themes/default/css/pmx_frontpage.css" destination="$themedir/css" />
 		<redirect url="$scripturl?action=admin;area=pmx_center" timeout="60000">install/installdone.html</redirect>
 	</upgrade>
 

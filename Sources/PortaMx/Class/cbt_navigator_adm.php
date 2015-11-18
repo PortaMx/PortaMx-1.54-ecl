@@ -5,8 +5,8 @@
 *
 * \author PortaMx - Portal Management Extension
 * \author Copyright 2008-2014 by PortaMx corp. - http://portamx.com
-* \version 1.53
-* \date 14.11.2014
+* \version 1.54
+* \date 18.11.2015
 */
 
 if(!defined('PortaMx'))
@@ -62,13 +62,6 @@ class pmxc_cbt_navigator_adm extends PortaMxC_SystemAdminBlock
 							<span class="adm_w80">'. $txt['pmx_cbtnavnum'] .'</span>
 							<div><input onkeyup="check_numeric(this);" size="2" type="text" name="config[settings][numrecent]" value="' .(isset($this->cfg['config']['settings']['numrecent']) ? $this->cfg['config']['settings']['numrecent'] : '5'). '" /></div>
 						</div>
-						<div class="adm_input" style="height:20px;">
-							<span class="adm_w80">'. $txt['pmx_cbtnavlen'] .'
-								<img class="info_toggle" onclick=\'Show_help("pmxCBTH01")\' src="'. $context['pmx_imageurl'] .'information.png" alt="*" title="'. $txt['pmx_information_icon'] .'" />
-							</span>
-							<div><input onkeyup="check_numeric(this);" size="2" type="text" name="config[settings][numlen]" value="' .(isset($this->cfg['config']['settings']['numlen']) ? $this->cfg['config']['settings']['numlen'] : '20'). '" /></div>
-						</div>
-						<div id="pmxCBTH01" class="info_frame" style="margin-top:4px;">'. $txt['pmx_cbt_shorten_hint'] .'</div>
 						<div class="adm_check" style="height:20px;">
 							<input type="hidden" name="config[settings][initexpand]" value="0" />
 							<span class="adm_w80">'. $txt['pmx_cbtnavexpand'] .'</span>

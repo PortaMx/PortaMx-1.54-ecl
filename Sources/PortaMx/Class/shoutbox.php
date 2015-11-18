@@ -5,8 +5,8 @@
 *
 * \author PortaMx - Portal Management Extension
 * \author Copyright 2008-2014 by PortaMx corp. - http://portamx.com
-* \version 1.53
-* \date 14.11.2014
+* \version 1.54
+* \date 18.11.2015
 */
 
 if(!defined('PortaMx'))
@@ -375,12 +375,11 @@ class pmxc_shoutbox extends PortaMxC_SystemBlock
 
 		echo '
 			<div id="bbcodes" style="position:absolute; z-index:9999; width:342px; height:110px; display:none">
-				<div class="'. $bodyclass .'">';
+				<div class="'. $bodyclass .'" style="padding:0;margin-top:10px;">';
 
 		if(empty($context['pmx_style_isCore']))
 			echo '
-					<span class="'. $spanclass . ($isCustFrame ? $this->cfg['config']['visuals']['frame'] .'_top' : 'upperframe') .'"><span></span></span>
-					<div class="'. $bodyclass .' roundframe shoutbox_round '. $this->cfg['config']['visuals']['frame'] .'" style="margin:auto; text-align:center;">';
+					<div class="'. $bodyclass .' plainbox blockcontent" style="margin:auto; text-align:center; padding:5px 0 !important;">';
 		else
 			echo '
 					<div class="'. $bodyclass .'shoutbox_core '. $this->cfg['config']['visuals']['frame'] .'" style="margin:auto; text-align:center;">';
@@ -419,7 +418,6 @@ class pmxc_shoutbox extends PortaMxC_SystemBlock
 							</select>
 						</div>
 					</div>
-					<span class="'. $spanclass . ($isCustFrame ? $this->cfg['config']['visuals']['frame'] .'_bot' : 'lowerframe') .'"><span></span></span>
 				</div>
 			</div>';
 

@@ -5,8 +5,8 @@
 *
 * \author PortaMx - Portal Management Extension
 * \author Copyright 2008-2014 by PortaMx corp. - http://portamx.com
-* \version 1.53
-* \date 14.11.2014
+* \version 1.54
+* \date 18.11.2015
 */
 
 if(!defined('PortaMx'))
@@ -151,7 +151,7 @@ class pmxc_newposts extends PortaMxC_SystemBlock
 								{
 									$datlen = strlen($data);
 									preg_match('~src?=?"([^\"]*\")~i', $data, $src);
-									$tmp = str_replace($src[0], ' onerror="onPmxImgError(this)" name="'. $this->imgName .'" title="'. substr(strrchr($src[1], '/'), 1) .' '. $src[0], preg_replace($fnd, '', $data));
+									$tmp = str_replace($src[0], ' name="'. $this->imgName .'" title="'. substr(strrchr($src[1], '/'), 1) .' '. $src[0], preg_replace($fnd, '', $data));
 
 									if(!empty($context['pmx']['settings']['disableHS']))
 										$this->posts[$row['id_msg']]['body'] = substr_replace($this->posts[$row['id_msg']]['body'], $tmp, strpos($this->posts[$row['id_msg']]['body'], $data), $datlen);

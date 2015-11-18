@@ -5,8 +5,8 @@
 *
 * \author PortaMx - Portal Management Extension
 * \author Copyright 2008-2014 by PortaMx corp. - http://portamx.com
-* \version 1.53
-* \date 14.11.2014
+* \version 1.54
+* \date 18.11.2015
 */
 
 if(!defined('SMF'))
@@ -97,7 +97,6 @@ function PortaMx($doinit = false)
 	<script language="JavaScript" type="text/javascript"><!-- // --><![CDATA[
 		var pmx_popup_rtl = '. (!empty($context['right_to_left']) ? 'true' : 'false') .';
 		var pmx_restore_top = '. (empty($context['pmx']['settings']['restoretop']) || !is_numeric($cook) ? '\'\'' : $cook) .';
-		var pmx_failed_image = \''. $context['pmx_imageurl'] .'empty.gif\';
 		var pmx_rescale_images = [];
 	// ]]></script>';
 

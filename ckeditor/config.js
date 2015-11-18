@@ -36,7 +36,8 @@ CKEDITOR.editorConfig = function( config ) {
 	config.removeDialogTabs = 'link:advanced';
 
 	// the smileys
-	config.smiley_images = ['afro.gif','angry.gif','azn.gif','cheesy.gif','cool.gif','cry.gif','embarrassed.gif','evil.gif','grin.gif','huh.gif','kiss.gif','laugh.gif','lipsrsealed.gif','rolleyes.gif','sad.gif','shocked.gif','smiley.gif','tongue.gif','undecided.gif','wink.gif'];
+	config.smiley_descriptions = [':))', ':)', ';)', ':D', ';D', '>:(', ':(', ':o', '8)', '???', '::)', ':P', ':-[', ':-X', ':-\\', ':-*', ':\'(', '>:D','^-^', 'O0'];
+	config.smiley_images = ['laugh.gif', 'smiley.gif', 'wink.gif', 'cheesy.gif', 'grin.gif', 'angry.gif', 'sad.gif', 'shocked.gif', 'cool.gif', 'huh.gif', 'rolleyes.gif', 'tongue.gif', 'embarrassed.gif', 'lipsrsealed.gif', 'undecided.gif', 'kiss.gif', 'cry.gif', 'evil.gif', 'azn.gif', 'afro.gif'];
 	config.smiley_path = CKEDITOR.basePath + '../Smileys/PortaMx/';
 	config.smiley_columns = 10;
 
