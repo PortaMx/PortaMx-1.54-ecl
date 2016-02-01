@@ -10,8 +10,21 @@
 #pmx_form {
 	clear: both;
 }
-
 /* common formatting styles */
+@media screen and (min-width: 300px) and (max-width: 640px) {
+	.responsive_menu.community {
+		background: url(Images/community.png) no-repeat;
+	}
+	.responsive_menu.download {
+		background: url(Images/down.gif) no-repeat;
+	}
+	.dropmenu li {
+		margin-top: 15px;
+	}
+	#main_menu {
+		margin-top: -20px;
+	}
+}
 .pmx_printimg
 {
 	cursor: pointer;

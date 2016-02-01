@@ -27,4 +27,5 @@ if(empty($modSettings['pmxportal_disabled']))
 
 // Load essentiell functions
 require_once($sourcedir .'/PortaMx/SubsCompat.php');
+pmx_IsMobile();
 ?>

@@ -455,7 +455,7 @@ class pmxc_polls extends PortaMxC_SystemBlock
 
 			$tablen = (100 / $this->polls['tablen']);
 			$tablen = ($tablen > 100 ? 100 : $tablen);
-			$ownpolls = $this->PollChoices[$this->polls['id']];
+			$ownpolls = isset($this->PollChoices[$this->polls['id']]) ? $this->PollChoices[$this->polls['id']] : array();
 
 			foreach($this->polls['options'] as $key => $option)
 			{

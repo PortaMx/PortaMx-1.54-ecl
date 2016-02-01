@@ -1204,6 +1204,21 @@ function getPanelsToShow(&$action)
 		}
 		else
 			$activePanels[] = $side;
+
+		// hide panel on device types?
+		if(!empty($context['pmx']['settings'][$side .'_panel']['device']))
+		{
+			if(!empty($modSettings['pmx_isMobile']) && $context['pmx']['settings'][$side .'_panel']['device'] != '1')
+			{
+				$activePanels = array_diff($activePanels,	array($side));
+				$context['pmx']['show_'. $side .'panel'] = false;
+			}
+			if(empty($modSettings['pmx_isMobile']) && $context['pmx']['settings'][$side .'_panel']['device'] != '2')
+			{
+				$activePanels = array_diff($activePanels,	array($side));
+				$context['pmx']['show_'. $side .'panel'] = false;
+			}
+		}
 	}
 
 	if(!empty($modSettings['pmx_paneloff']))
@@ -2338,7 +2353,8 @@ function pmx_teasegetwords($text, $wordcount)
 	}
 	$wordcount += $addwords;
 	$words = preg_split('/ /', $text, $wordcount+1);
-	$words[$wordcount-1] = preg_replace('/<[^>]*>/', '', $words[$wordcount-1]);
+	if(isset($words[$wordcount-1]))
+		$words[$wordcount-1] = preg_replace('/<[^>]*>/', '', $words[$wordcount-1]);
 	unset($words[$wordcount]);
 
 	$text = '';

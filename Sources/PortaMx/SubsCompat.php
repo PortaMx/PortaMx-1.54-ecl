@@ -274,4 +274,31 @@ function pmx_serialize($data)
 	else
 		return preg_replace('/s:(\d+):"([^"]*)";/se', "'s:'. strlen('\\2') .':\"\\2\";'", serialize($data));
 }
+
+/**
+* pmx_IsMobile - called from PortaMx Loader
+* returns nothing
+**/
+function pmx_IsMobile()
+{
+	global $modSettings;
+
+	$modSettings['pmx_isMobile'] = false;
+
+	// smartphone string variables.
+	$mobileStrings = array(
+		'android',
+		'iemobile',
+		'iphone',
+		'ipod',
+		'ipad',
+		'kindle',
+		'mobile',
+		'mobi',
+	);
+
+	$useragent = strtolower($_SERVER['HTTP_USER_AGENT']);
+	if(preg_match_all('~'. implode('\b|', $mobileStrings) .'\b~i', $useragent, $device))
+		$modSettings['pmx_isMobile'] = true;
+}
 ?>

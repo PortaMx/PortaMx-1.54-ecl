@@ -710,6 +710,24 @@ function template_main()
 								</div>
 							</td>
 						</tr>
+
+						<tr>
+							<td style="padding:2px 5px; width:50%; text-align:'. $RtL .';" valign="top">
+								<div style="min-height:25px;padding-top:4px;">'. $txt['pmx_settings_devices'] .'
+									<img class="info_toggle" style="text-align:right;padding-top:2px;" onclick="Show_help(\'pmxDH_'. $side .'\', \'left\')" src="'. $context['pmx_imageurl'] .'information.png" alt="*" title="'. $txt['pmx_information_icon'] .'" />
+								</div>
+								<div id="pmxDH_'. $side .'" class="info_frame">'. $txt['pmx_settings_deviceshelp'] .'</div>
+							</td>
+							<td style="padding:5px; width:50%;">
+								<input type="hidden" name="'. $side .'_panel[device]" value="0" />
+								<div style="min-height:60px; margin-left:-5px;">
+									<div style="width:95%;"><input class="input_radio" type="radio" name="'. $side .'_panel[device]" value="0"'. (empty($admset[$side .'_panel']['device']) ? ' checked="checked"' : '') .' style="vertical-align:-3px;" /> '. $txt['pmx_devices']['all'] .'</div>
+									<div style="width:95%;"><input class="input_radio" type="radio" name="'. $side .'_panel[device]" value="1"'. (!empty($admset[$side .'_panel']['device']) && $admset[$side .'_panel']['device'] == '1' ? ' checked="checked"' : '') .' style="vertical-align:-3px;" /> '. $txt['pmx_devices']['mobil'] .'</div>
+									<div style="width:95%;"><input class="input_radio" type="radio" name="'. $side .'_panel[device]" value="2"'. (!empty($admset[$side .'_panel']['device']) && $admset[$side .'_panel']['device'] == '2' ? ' checked="checked"' : '') .' style="vertical-align:-3px;" /> '. $txt['pmx_devices']['desk'] .'</div>
+								</div>
+							</td>
+						</tr>
+
 						<tr>
 							<td valign="top" colspan="2">
 								<div style="margin:0 auto; padding:5px 0 '. ($side == 'foot' ? '0' : '10px') .' 0; text-align:center;">

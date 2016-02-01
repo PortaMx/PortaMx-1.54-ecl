@@ -145,6 +145,15 @@ $txt['pmx_action_names'] = array(
 	'helpdesk' => 'Simpledesk Modfication',
 );
 
+// Device settings
+$txt['pmx_blocks_devices'] = 'Visibility on device types';
+$txt['pmx_blocks_deviceshelp'] = 'Select the type of device on which the block is to be displayed.';
+$txt['pmx_settings_devices'] = 'Panel visibility on device types:';
+$txt['pmx_settings_deviceshelp'] = 'Select the type of device on which the panel is to be displayed.';
+$txt['pmx_devices']['all'] = 'Show on all devices';
+$txt['pmx_devices']['desk'] = 'Show only on Desktop devices';
+$txt['pmx_devices']['mobil'] = 'Show only on Mobile devices';
+
 // default settings
 $txt['pmx_defaultsettings'] = 'This block type have no settings.';
 $txt['pmx_default_header_none'] = 'Not show';
